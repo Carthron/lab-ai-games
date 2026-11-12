@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Does It? Team Challenge: AI and Automation in the Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0F1B2D;--black:#0B0F14;--teal:#006C68;--mint:#91E2CE;--line:#D5DEE2;--bg:#F3F6F8;--muted:#4A5B6B;
+--red:#B3261E;--redbg:#FCE8E6;--amber:#9A5B00;--amberbg:#FFF3DC;--green:#0E7A4E;--greenbg:#E3F5EC;--blue:#1F4E9A;--bluebg:#E7EEFA}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer}
+.bar{background:var(--black);color:#fff;position:sticky;top:0;z-index:5}
+.bar .in{max-width:980px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar .t{font-weight:800;letter-spacing:.02em}
+.bar .t small{display:block;font-weight:500;color:#9FB0BF;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.score{white-space:nowrap;font-family:"JetBrains Mono",monospace;background:#1B232D;border:1px solid #2C3846;border-radius:8px;padding:6px 12px;font-size:14px}
+.score b{color:var(--mint)}
+.wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px}
+.hero{background:linear-gradient(135deg,#0B0F14 0%,#14303A 100%);color:#fff;border:none;padding:36px 30px}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 12px}
+.hero p{color:#CFDBE2;font-size:17px;max-width:64ch}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.hero .kick{color:var(--mint)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:14px}
+.btn{border:none;border-radius:10px;padding:13px 20px;font-weight:700;font-size:15.5px;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.1)} .btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.mint{background:var(--mint);color:var(--black)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+h2{font-size:clamp(22px,3.2vw,28px);margin:6px 0 6px;line-height:1.2}
+h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.terms div{background:var(--bg);border-radius:12px;padding:14px}
+.terms b{display:block;margin-bottom:4px}
+.terms small{color:var(--muted);font-size:14px}
+.prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.prog .lbl{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.dots{display:flex;gap:6px}.dots i{width:34px;height:6px;border-radius:6px;background:var(--line)}.dots i.on{background:var(--teal)}
+.story{font-size:16.5px}
+/* LIS screen */
+.lis{border-radius:12px;overflow:hidden;border:1px solid #23303D;margin:16px 0;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:#0E141B;color:#D7E1EA}
+.lis .head{background:#000;padding:9px 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700;font-size:12.5px;letter-spacing:.06em}
+.lis .head .sys{color:var(--mint)}
+.lis .body{padding:14px;overflow-x:auto}
+.lis table{border-collapse:collapse;width:100%;min-width:520px}
+.lis td,.lis th{padding:6px 8px;border-bottom:1px solid #1F2A36;text-align:left;white-space:nowrap}
+.lis th{color:#8DA0B3;font-weight:500;font-size:12px}
+.hi{color:#FF8A80;font-weight:700}.lo{color:#82B1FF;font-weight:700}
+.flag{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:700}
+.f-red{background:#5A1714;color:#FFB4AB}.f-amb{background:#4A3300;color:#FFD38A}.f-grn{background:#0D3B28;color:#9FE6BF}.f-blu{background:#14294D;color:#A9C4FF}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 18px;margin-bottom:10px}
+.kv div span{color:#8DA0B3}
+.note{margin-top:10px;border-left:3px solid var(--mint);padding:6px 10px;background:#121C25;color:#BFD0DD;white-space:normal}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:10px}
+.cell{background:#16202B;border-radius:10px;padding:10px;text-align:center;font-size:12px}
+.cell svg{display:block;margin:0 auto 6px}
+/* questions */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+.q .qh{font-weight:700;font-size:16.5px;margin-bottom:12px}
+.q .pts{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.06em}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt .L{flex:none;width:26px;height:26px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-weight:800;font-size:13px}
+.opt.right{border-color:var(--green);background:var(--greenbg)} .opt.right .L{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--redbg)} .opt.wrong .L{background:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;border-radius:10px;padding:12px 14px;font-size:15px;animation:pop .25s ease}
+.fb.good{background:var(--greenbg);border-left:4px solid var(--green)}
+.fb.miss{background:var(--amberbg);border-left:4px solid var(--amber)}
+.fb b.h{display:block;margin-bottom:2px}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.take{background:var(--bluebg);border-radius:12px;padding:16px;margin-top:18px}
+.take b{color:var(--blue)}
+textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:15px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+.cc{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);text-align:right}
+.cc.ok{color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.big{font-size:60px;font-weight:800;color:var(--teal);line-height:1;font-family:"JetBrains Mono",monospace}
+.covered{display:grid;gap:10px;margin-top:10px}
+.covered div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px}
+input[type=text]{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:16px}
+.cert{border:3px double var(--teal);border-radius:14px;padding:28px;text-align:center;margin-top:16px;background:#FBFDFD}
+.cert .nm{font-size:30px;font-weight:800;margin:8px 0}
+.cert small{color:var(--muted)}
+.links a{color:var(--teal);font-weight:600}
+.links li{margin:6px 0}
+.hidden{display:none!important}
+.msg{font-size:14px;color:var(--muted);margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 18px 30px}
+</style>
+<style>
+.learn{background:#F0FAF8;border:1.5px solid #BFE6DC;border-radius:14px;padding:20px;margin:14px 0}
+.learn .kick{margin-bottom:6px}
+.learn p{margin:6px 0;font-size:16px}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.pipe div{flex:1;min-width:110px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.pipe div b{display:block;font-size:26px;margin-bottom:4px}
+.pipe .ar{flex:0;min-width:0;border:none;background:none;display:grid;place-items:center;font-size:22px;color:var(--teal);padding:0}
+.sim{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0;background:#fff}
+.sim .sh{background:var(--black);color:#fff;padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;font-family:"JetBrains Mono",monospace}
+.sim .sb{padding:16px}
+.sim table{width:100%;border-collapse:collapse;font-size:15px}
+.sim td,.sim th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+.sim th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chipg{display:inline-block;border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700}
+.cg{background:var(--greenbg);color:var(--green)}.ca{background:var(--amberbg);color:var(--amber)}.cr{background:var(--redbg);color:var(--red)}
+.rule{font-family:"JetBrains Mono",monospace;font-size:14px;background:var(--bg);border-radius:10px;padding:12px 14px;margin:10px 0;line-height:1.7}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:8px}
+.gal div{background:var(--bg);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.gal b{display:block;font-size:24px;color:var(--teal)}
+.plates{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.plates figure{margin:0;text-align:center;font-size:14px}
+</style>
+<style>
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
+.roles div{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.roles b{display:block;font-size:16px}
+.members{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
+.members input{max-width:none}
+.huddle{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#FFF8E6;border:1.5px solid #F2D9A0;border-radius:12px;padding:14px 16px;margin:14px 0;font-size:15.5px}
+.huddle b{color:var(--amber)}
+.tbtn{border:1.5px solid var(--amber);background:#fff;color:var(--amber);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.tbtn.run{background:var(--amber);color:#fff}
+.steps2{display:grid;gap:8px;margin-top:10px}
+.stepbtn{display:flex;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:12px 14px;font-size:15.5px;color:var(--ink)}
+.stepbtn .n{flex:none;width:30px;height:30px;border-radius:8px;background:var(--bg);display:grid;place-items:center;font-weight:800}
+.stepbtn.on .n{background:var(--teal);color:#fff}
+.stepbtn.ok{border-color:var(--green);background:var(--greenbg)} .stepbtn.bad{border-color:var(--red);background:var(--redbg)}
+.task{border:1.5px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.task .tt{font-weight:600;font-size:16px;margin-bottom:10px}
+.pick{display:flex;gap:8px;flex-wrap:wrap}
+.pk{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:14px;color:var(--ink)}
+.pk.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pk.ok{background:var(--greenbg);border-color:var(--green);color:var(--green)}
+.pk.bad{background:var(--redbg);border-color:var(--red);color:var(--red)}
+.task .ex{font-size:14.5px;color:var(--muted);margin-top:8px}
+.summary{white-space:pre-wrap;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:var(--bg);border-radius:10px;padding:14px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="t">🧩 Who Does It?<small>Team challenge · AI &amp; Automation in the Lab</small></div>
+  <div class="score">TEAM <b id="score">0</b> / 300</div>
+</div></div>
+<div class="wrap" id="app"></div>
+<footer>For education. Examples are simplified. No medical background needed. Some tasks can be done differently in different labs.</footer>
+<script>
+const ROLES=[
+ ["📖 Reader","Reads each screen out loud to the team."],
+ ["🖱️ Driver","Controls the device and enters the team's choices."],
+ ["⏱️ Timekeeper","Runs the huddle timer and keeps the team moving."],
+ ["🎤 Presenter","Shares the team's answers in the class report-out."]];
+const ORDER=["Collect the sample from the patient","Label the tube with a barcode","Transport the tube to the lab","Sort and spin the tube","Run the test on an analyzer","Review the result","Send the result to the care team"];
+const CATS={A:"Automation",I:"AI",P:"Person"};
+const TASKS=[
+ {t:"Read a tube's barcode to know whose sample it is",a:"A",ex:"A scanner follows fixed steps. It doesn't learn or decide."},
+ {t:"Move tubes along a conveyor track to the right machine",a:"A",ex:"Robotic tracks follow programmed routes."},
+ {t:"Spin tubes in a centrifuge for a set time",a:"A",ex:"A timer and motor repeat the same steps every time."},
+ {t:"Automatically release a normal result that passes all of the lab's written rules",a:"A",ex:"This is rule-based automation (autoverification). The rules were written by people."},
+ {t:"Look at a photo of a blood cell and suggest what type it is",a:"I",ex:"This software learned from many labeled pictures, which is what makes it AI."},
+ {t:"Sort photos of culture dishes into 'growth' and 'no growth'",a:"I",ex:"AI plate readers learned patterns from example images."},
+ {t:"Notice unusual patterns across thousands of results that people might miss",a:"I",ex:"Finding patterns in large amounts of data is a common use of AI."},
+ {t:"Decide whether a lab rule should be changed after a mistake",a:"P",ex:"Changing how the lab works is a responsibility for trained, accountable people."},
+ {t:"Decide whether an AI tool can be trusted after the lab switches to new supplies",a:"P",ex:"People decide when a tool is safe to use, after testing it."},
+ {t:"Tell the care team when a result looks wrong or dangerous",a:"P",ex:"Speaking up and explaining what's wrong is a human job, even when software raises an alert."}];
+const SPEAK=[
+ {q:"The machine sends out a result automatically, but your team notices the sample tube was cracked. What should you do?",
+  o:["Nothing. The machine already approved it","Tell your supervisor right away so the result can be checked","Fix the number yourself","Wait to see if anyone complains"],a:1,
+  ex:"Software only checks what it was told to check. A person who notices a problem should raise it with someone who can act."},
+ {q:"An AI tool suggests a cell is 'normal,' but to you it looks very different from the normal examples you studied. You're new. What should you do?",
+  o:["Trust the AI. It's more experienced than you","Ask an experienced coworker to take a look","Delete the picture","Change the AI's answer without telling anyone"],a:1,
+  ex:"Being new is a reason to ask, not to stay quiet. A second set of trained eyes is how mistakes get caught."},
+ {q:"Your lab wants to start using a new AI tool next week. What should happen first?",
+  o:["Turn it on for all patients right away","Test it in your own lab and train staff on its limits before using it for patients","Let the AI test itself","Skip training; AI doesn't need people"],a:1,
+  ex:"Before a tool is used for patients, the lab checks that it works under its own conditions, and staff learn where it can go wrong."}];
+
+const S={screen:"setup",team:"",members:["","","",""],score:0,order:[],orderChecked:false,tasks:TASKS.map(()=>null),tasksChecked:false,speak:SPEAK.map(()=>null),timer:null,tleft:0};
+const app=document.getElementById("app");const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function calc(){let t=0;
+ if(S.orderChecked){S.order.forEach((v,i)=>{if(v===i)t+=Math.round(60/ORDER.length*100)/100})}
+ if(S.tasksChecked){S.tasks.forEach((v,i)=>{if(v===TASKS[i].a)t+=15})}
+ S.speak.forEach((v,i)=>{if(v===SPEAK[i].a)t+=30});
+ S.score=Math.round(t);$("#score").textContent=S.score}
+function go(s){stopT();S.screen=s;render();window.scrollTo({top:0,behavior:"smooth"})}
+function huddle(prompt,secs){return `<div class="huddle"><span>🗣 <b>Team huddle:</b> ${prompt}</span><button class="tbtn" id="tbtn" data-s="${secs}">Start ${secs/60}-min timer</button></div>`}
+function wireTimer(){const b=$("#tbtn");if(!b)return;b.onclick=()=>{if(S.timer){stopT();b.textContent=`Start ${b.dataset.s/60}-min timer`;b.classList.remove("run");return}
+ S.tleft=+b.dataset.s;b.classList.add("run");const tick=()=>{const m=Math.floor(S.tleft/60),s=S.tleft%60;b.textContent=S.tleft>0?`⏱ ${m}:${String(s).padStart(2,"0")} (tap to stop)`:"⏰ Time! Decide as a team";if(S.tleft<=0){clearInterval(S.timer);S.timer=null;return}S.tleft--};tick();S.timer=setInterval(tick,1000)}}
+function stopT(){clearInterval(S.timer);S.timer=null}
+function prog(i,label){return `<div class="prog"><span class="lbl">${label}</span><span class="dots">${[0,1,2].map(k=>`<i class="${k<=i?'on':''}"></i>`).join("")}</span></div>`}
+
+function setup(){
+ app.innerHTML=`
+ <section class="card hero">
+  <div class="kick">👥 Team challenge · No medical background needed</div>
+  <h1>Who Does It?</h1>
+  <p>In a modern lab, some jobs belong to machines, some to AI, and some only to people. Your team will put a sample's journey in order, decide who should do each task, and practice speaking up when something looks wrong.</p>
+  <div class="meta"><span>👥 Teams of 4</span><span>⏱ About 20 minutes</span><span>🧩 3 rounds</span><span>🏆 300 points</span></div>
+ </section>
+ <section class="card">
+  <h3>Set up your team</h3>
+  <input type="text" id="team" placeholder="Team name" value="${esc(S.team)}">
+  <div class="members">${S.members.map((m,i)=>`<input type="text" data-m="${i}" placeholder="${ROLES[i][0].slice(3)}: name" value="${esc(m)}">`).join("")}</div>
+  <h3 style="margin-top:20px">Team roles</h3>
+  <div class="roles">${ROLES.map(r=>`<div><b>${r[0]}</b>${r[1]}</div>`).join("")}</div>
+  <p class="msg">Teams of 3 or 5: combine Reader and Timekeeper, or add a second Presenter.</p>
+  <div class="row"><button class="btn" id="go">Start Round 1 ➜</button></div>
+ </section>`;
+ $("#team").oninput=e=>S.team=e.target.value;
+ app.querySelectorAll("[data-m]").forEach(i=>i.oninput=e=>S.members[+i.dataset.m]=e.target.value);
+ $("#go").onclick=()=>{if(!S.team.trim()){$("#team").focus();$("#team").placeholder="Team name (required)";return}go("r1")};
+}
+
+// shuffled display order for round 1
+const SHUF=[3,0,5,1,6,2,4];
+function r1(){
+ const done=S.orderChecked;
+ app.innerHTML=`${prog(0,"ROUND 1 OF 3 · 60 PTS")}
+ <section class="card">
+  <div class="kick">🧪 Round 1</div><h2>Put the tube's journey in order</h2>
+  <div class="learn"><div class="kick">📖 Learn</div><p>Every lab result starts as a sample from a patient and passes through several steps before anyone sees the number. Machines now do many of these steps. Knowing the order helps you see where things can go wrong.</p></div>
+  ${huddle("Agree on the order before the Driver taps anything.",120)}
+  <p class="msg" style="margin-top:0">Tap the steps in order, first to last. Tap a numbered step again to undo it.</p>
+  <div class="steps2">${SHUF.map(i=>{const pos=S.order.indexOf(i);const cls=done?(S.order[i]===i?"":""):"";
+    let st="";if(done){st=S.order.indexOf(i)===i?"ok":"bad"}
+    return `<button class="stepbtn ${pos>-1?'on':''} ${st}" data-i="${i}" ${done?"disabled":""}><span class="n">${pos>-1?pos+1:""}</span><span>${ORDER[i]}${done&&S.order.indexOf(i)!==i?` <b style="color:var(--green)">→ step ${i+1}</b>`:""}</span></button>`}).join("")}</div>
+  ${done?`<div class="fb ${S.order.every((v,k)=>v===k)?'good':'miss'}"><b class="h">${S.order.filter((v,k)=>v===k).length} of ${ORDER.length} in the right place</b>The order is: collect, label, transport, sort and spin, test, review, then send. Machines can handle most steps from labeling to testing. A problem early on, like a tube that waits too long, can still change the result at the end.</div>`:""}
+  <div class="row">${done?`<button class="btn" id="next">Round 2 ➜</button>`:`<button class="btn" id="check" ${S.order.length===ORDER.length?"":"disabled"}>Lock in our order</button><button class="btn ghost" id="reset">Reset</button>`}</div>
+ </section>`;
+ wireTimer();
+ app.querySelectorAll(".stepbtn").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;const p=S.order.indexOf(i);if(p>-1)S.order.splice(p,1);else S.order.push(i);render()});
+ const c=$("#check");if(c)c.onclick=()=>{S.orderChecked=true;calc();render()};
+ const r=$("#reset");if(r)r.onclick=()=>{S.order=[];render()};
+ const n=$("#next");if(n)n.onclick=()=>go("r2");
+}
+
+function r2(){
+ const done=S.tasksChecked,all=S.tasks.every(v=>v);
+ app.innerHTML=`${prog(1,"ROUND 2 OF 3 · 150 PTS")}
+ <section class="card">
+  <div class="kick">🤖 Round 2</div><h2>Who should do it: Automation, AI, or a Person?</h2>
+  <div class="learn"><div class="kick">📖 Learn</div>
+   <p><b>Automation</b> follows fixed steps or rules that people wrote. It does exactly what it's told.</p>
+   <p><b>AI</b> learned patterns from many examples, such as pictures, and makes suggestions.</p>
+   <p><b>A person</b> is needed for judgment, responsibility, and explaining what's wrong.</p></div>
+  ${huddle("For each task, the Reader reads it aloud. Everyone votes, then the Driver enters the team's choice.",240)}
+  ${TASKS.map((t,i)=>{const v=S.tasks[i];return `<div class="task"><div class="tt">${i+1}. ${t.t}</div><div class="pick">${Object.entries(CATS).map(([k,l])=>{let c="";if(done){if(k===t.a)c="ok";else if(k===v)c="bad"}else if(k===v)c="sel";return `<button class="pk ${c}" data-t="${i}" data-k="${k}" ${done?"disabled":""}>${l}</button>`}).join("")}</div>${done?`<div class="ex">${v===t.a?"✅":"↪"} ${t.ex}</div>`:""}</div>`}).join("")}
+  ${done?`<div class="take"><b>Talk about it:</b> Which task did your team argue about most? Could any of these be done differently in a different lab?</div>`:""}
+  <div class="row">${done?`<button class="btn" id="next">Round 3 ➜</button>`:`<button class="btn" id="check" ${all?"":"disabled"}>Lock in our answers</button><span class="msg">${S.tasks.filter(v=>v).length} of ${TASKS.length} chosen</span>`}</div>
+ </section>`;
+ wireTimer();
+ app.querySelectorAll(".pk").forEach(b=>b.onclick=()=>{S.tasks[+b.dataset.t]=b.dataset.k;render()});
+ const c=$("#check");if(c)c.onclick=()=>{S.tasksChecked=true;calc();render()};
+ const n=$("#next");if(n)n.onclick=()=>go("r3");
+}
+
+function r3(){
+ const all=S.speak.every(v=>v!==null);
+ app.innerHTML=`${prog(2,"ROUND 3 OF 3 · 90 PTS")}
+ <section class="card">
+  <div class="kick">🗣 Round 3</div><h2>Speak up!</h2>
+  <div class="learn"><div class="kick">📖 Learn</div><p>Machines and AI make mistakes too. In a lab, anyone who notices a problem, including the newest person on the team, is expected to say something. Patients are safer when people speak up.</p></div>
+  ${huddle("Each person says what they would do before the team chooses.",120)}
+  ${SPEAK.map((q,qi)=>{const a=S.speak[qi],l=a!==null;return `<div class="q"><div class="pts">SITUATION ${qi+1} · 30 PTS</div><div class="qh">${q.q}</div>
+   ${q.o.map((o,oi)=>`<button class="opt ${l&&oi===q.a?'right':''} ${l&&oi===a&&a!==q.a?'wrong':''}" data-q="${qi}" data-o="${oi}" ${l?"disabled":""}><span class="L">${"ABCD"[oi]}</span><span>${o}</span></button>`).join("")}
+   ${l?`<div class="fb ${a===q.a?'good':'miss'}"><b class="h">${a===q.a?"Correct · +30":"Not quite · best answer: "+"ABCD"[q.a]}</b>${q.ex}</div>`:""}</div>`}).join("")}
+  <div class="row">${all?`<button class="btn" id="next">See our results ➜</button>`:`<span class="msg">Answer all three to continue.</span>`}</div>
+ </section>`;
+ wireTimer();
+ app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{S.speak[+b.dataset.q]=+b.dataset.o;calc();render()});
+ const n=$("#next");if(n)n.onclick=()=>go("done");
+}
+
+function done(){
+ const oc=S.order.filter((v,k)=>v===k).length,tc=S.tasks.filter((v,i)=>v===TASKS[i].a).length,sc=S.speak.filter((v,i)=>v===SPEAK[i].a).length;
+ const names=S.members.filter(m=>m.trim()).join(", ")||"(not entered)";
+ const sum=`Team: ${S.team}\nMembers: ${names}\nScore: ${S.score} / 300\nRound 1 (order): ${oc}/${ORDER.length} steps\nRound 2 (who does it): ${tc}/${TASKS.length} tasks\nRound 3 (speak up): ${sc}/${SPEAK.length} situations`;
+ app.innerHTML=`
+ <section class="card">
+  <div class="kick">🏁 Challenge complete</div>
+  <div class="row" style="margin-top:6px;align-items:flex-end;gap:18px"><div class="big">${S.score}</div><div><h2 style="margin:0">${esc(S.team)}</h2><div class="msg" style="margin:0">out of 300 points</div></div></div>
+ </section>
+ <section class="card">
+  <h3>🎤 Presenter: report out to the class</h3>
+  <div class="covered">
+   <div>1. Your team's score and the round you found hardest.</div>
+   <div>2. One task your team debated in Round 2, and what you decided.</div>
+   <div>3. In one sentence: when should a person step in instead of a machine?</div>
+  </div>
+  <h3 style="margin-top:20px">Team summary</h3>
+  <div class="summary" id="sum">${esc(sum)}</div>
+  <div class="row"><button class="btn" id="copy">Copy summary</button><button class="btn ghost" id="again">Play again</button></div>
+  <p class="msg" id="cmsg">Copy the summary to send to your instructor, or take a screenshot of this screen.</p>
+ </section>
+ <section class="card">
+  <h3>Key ideas</h3>
+  <div class="covered">
+   <div>🤖 <b>Automation</b> follows fixed steps and rules. It's fast and consistent but only does what it's told.</div>
+   <div>🧠 <b>AI</b> learns from examples and makes suggestions that people review.</div>
+   <div>🧑‍🔬 <b>People</b> make judgment calls, take responsibility, and speak up when something looks wrong.</div>
+  </div>
+ </section>`;
+ $("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(sum);$("#cmsg").textContent="Copied. Paste it wherever your instructor asked."}catch(e){$("#cmsg").textContent="Copying isn't available here. Take a screenshot instead."}};
+ $("#again").onclick=()=>{Object.assign(S,{order:[],orderChecked:false,tasks:TASKS.map(()=>null),tasksChecked:false,speak:SPEAK.map(()=>null)});calc();go("setup")};
+}
+function render(){({setup,r1,r2,r3,done})[S.screen]()}
+render();
+</script>
+</body>
+</html>
