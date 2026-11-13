@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab AI Rounds: Intro to AI and Automation in Laboratory Medicine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--ink:#0F1B2D;--black:#0B0F14;--teal:#006C68;--mint:#91E2CE;--line:#D5DEE2;--bg:#F3F6F8;--muted:#4A5B6B;
+--red:#B3261E;--redbg:#FCE8E6;--amber:#9A5B00;--amberbg:#FFF3DC;--green:#0E7A4E;--greenbg:#E3F5EC;--blue:#1F4E9A;--bluebg:#E7EEFA}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer}
+.bar{background:var(--black);color:#fff;position:sticky;top:0;z-index:5}
+.bar .in{max-width:980px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar .t{font-weight:800;letter-spacing:.02em}
+.bar .t small{display:block;font-weight:500;color:#9FB0BF;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.score{white-space:nowrap;font-family:"JetBrains Mono",monospace;background:#1B232D;border:1px solid #2C3846;border-radius:8px;padding:6px 12px;font-size:14px}
+.score b{color:var(--mint)}
+.wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px}
+.hero{background:linear-gradient(135deg,#0B0F14 0%,#14303A 100%);color:#fff;border:none;padding:36px 30px}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 12px}
+.hero p{color:#CFDBE2;font-size:17px;max-width:64ch}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.hero .kick{color:var(--mint)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:14px}
+.btn{border:none;border-radius:10px;padding:13px 20px;font-weight:700;font-size:15.5px;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.1)} .btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.mint{background:var(--mint);color:var(--black)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+h2{font-size:clamp(22px,3.2vw,28px);margin:6px 0 6px;line-height:1.2}
+h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.terms div{background:var(--bg);border-radius:12px;padding:14px}
+.terms b{display:block;margin-bottom:4px}
+.terms small{color:var(--muted);font-size:14px}
+.prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.prog .lbl{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.dots{display:flex;gap:6px}.dots i{width:34px;height:6px;border-radius:6px;background:var(--line)}.dots i.on{background:var(--teal)}
+.story{font-size:16.5px}
+/* LIS screen */
+.lis{border-radius:12px;overflow:hidden;border:1px solid #23303D;margin:16px 0;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:#0E141B;color:#D7E1EA}
+.lis .head{background:#000;padding:9px 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700;font-size:12.5px;letter-spacing:.06em}
+.lis .head .sys{color:var(--mint)}
+.lis .body{padding:14px;overflow-x:auto}
+.lis table{border-collapse:collapse;width:100%;min-width:520px}
+.lis td,.lis th{padding:6px 8px;border-bottom:1px solid #1F2A36;text-align:left;white-space:nowrap}
+.lis th{color:#8DA0B3;font-weight:500;font-size:12px}
+.hi{color:#FF8A80;font-weight:700}.lo{color:#82B1FF;font-weight:700}
+.flag{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:700}
+.f-red{background:#5A1714;color:#FFB4AB}.f-amb{background:#4A3300;color:#FFD38A}.f-grn{background:#0D3B28;color:#9FE6BF}.f-blu{background:#14294D;color:#A9C4FF}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 18px;margin-bottom:10px}
+.kv div span{color:#8DA0B3}
+.note{margin-top:10px;border-left:3px solid var(--mint);padding:6px 10px;background:#121C25;color:#BFD0DD;white-space:normal}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:10px}
+.cell{background:#16202B;border-radius:10px;padding:10px;text-align:center;font-size:12px}
+.cell svg{display:block;margin:0 auto 6px}
+/* questions */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+.q .qh{font-weight:700;font-size:16.5px;margin-bottom:12px}
+.q .pts{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.06em}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt .L{flex:none;width:26px;height:26px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-weight:800;font-size:13px}
+.opt.right{border-color:var(--green);background:var(--greenbg)} .opt.right .L{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--redbg)} .opt.wrong .L{background:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;border-radius:10px;padding:12px 14px;font-size:15px;animation:pop .25s ease}
+.fb.good{background:var(--greenbg);border-left:4px solid var(--green)}
+.fb.miss{background:var(--amberbg);border-left:4px solid var(--amber)}
+.fb b.h{display:block;margin-bottom:2px}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.take{background:var(--bluebg);border-radius:12px;padding:16px;margin-top:18px}
+.take b{color:var(--blue)}
+textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:15px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+.cc{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);text-align:right}
+.cc.ok{color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.big{font-size:60px;font-weight:800;color:var(--teal);line-height:1;font-family:"JetBrains Mono",monospace}
+.covered{display:grid;gap:10px;margin-top:10px}
+.covered div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px}
+input[type=text]{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:16px}
+.cert{border:3px double var(--teal);border-radius:14px;padding:28px;text-align:center;margin-top:16px;background:#FBFDFD}
+.cert .nm{font-size:30px;font-weight:800;margin:8px 0}
+.cert small{color:var(--muted)}
+.links a{color:var(--teal);font-weight:600}
+.links li{margin:6px 0}
+.hidden{display:none!important}
+.msg{font-size:14px;color:var(--muted);margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 18px 30px}
+</style>
+<style>
+.learn{background:#F0FAF8;border:1.5px solid #BFE6DC;border-radius:14px;padding:20px;margin:14px 0}
+.learn .kick{margin-bottom:6px}
+.learn p{margin:6px 0;font-size:16px}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.pipe div{flex:1;min-width:110px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.pipe div b{display:block;font-size:26px;margin-bottom:4px}
+.pipe .ar{flex:0;min-width:0;border:none;background:none;display:grid;place-items:center;font-size:22px;color:var(--teal);padding:0}
+.sim{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0;background:#fff}
+.sim .sh{background:var(--black);color:#fff;padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;font-family:"JetBrains Mono",monospace}
+.sim .sb{padding:16px}
+.sim table{width:100%;border-collapse:collapse;font-size:15px}
+.sim td,.sim th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+.sim th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chipg{display:inline-block;border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700}
+.cg{background:var(--greenbg);color:var(--green)}.ca{background:var(--amberbg);color:var(--amber)}.cr{background:var(--redbg);color:var(--red)}
+.rule{font-family:"JetBrains Mono",monospace;font-size:14px;background:var(--bg);border-radius:10px;padding:12px 14px;margin:10px 0;line-height:1.7}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:8px}
+.gal div{background:var(--bg);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.gal b{display:block;font-size:24px;color:var(--teal)}
+.plates{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.plates figure{margin:0;text-align:center;font-size:14px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="t">🧪 Lab AI Rounds<small>Intro · AI &amp; Automation in the Lab</small></div>
+  <div class="score">SCORE <b id="score">0</b> / 300</div>
+</div></div>
+<div class="wrap" id="app"></div>
+<footer>For education. Examples are simplified and fictional. No medical background needed.</footer>
+
+<script>
+const plate=(bg,dots)=>`<svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="50" fill="${bg}" stroke="#9AA9B4" stroke-width="3"/>${dots.map(([x,y,r,c])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c}"/>`).join("")}</svg>`;
+const DOTS_A=[[40,40,6,"#F4F1E8"],[62,48,5,"#F4F1E8"],[50,68,6,"#F4F1E8"],[72,70,4,"#F4F1E8"],[35,62,5,"#F4F1E8"]];
+const DOTS_B=DOTS_A.map(([x,y,r])=>[x,y,r,"#E3CFA0"]);
+
+const SCEN=[
+{
+  title:"Follow the Tube",
+  area:"Automation",
+  emoji:"🤖",
+  learn:`<p><b>Laboratory medicine</b> is the work of testing samples, such as blood or urine, so that doctors and nurses have information to make decisions. A large hospital lab can run thousands of tests a day.</p>
+  <p><b>Automation</b> means machines do the repetitive physical steps: reading the label, sorting tubes, spinning them, running the test, and storing them. Machines don't get tired and do each step the same way every time.</p>
+  <p>Some labs also use <b>rules in software</b> to decide which results can be sent out automatically and which need a person to look first. This is called <b>autoverification</b>. A rule is an if-then instruction that people write. It does exactly what it says and nothing more.</p>`,
+  sim:()=>`<div class="pipe">
+      <div><b>🏷️</b>Scan barcode</div><div class="ar">→</div>
+      <div><b>🗂️</b>Sort tube</div><div class="ar">→</div>
+      <div><b>🌀</b>Spin in centrifuge</div><div class="ar">→</div>
+      <div><b>🔬</b>Run test</div><div class="ar">→</div>
+      <div><b>📋</b>Rule check</div></div>
+    <div class="sim"><div class="sh">THE LAB'S RELEASE RULE (written by lab staff)</div><div class="sb">
+      <div class="rule">IF the machine's quality check passed<br>AND the sample is not damaged<br>THEN send the result automatically<br>OTHERWISE hold it for a person to review</div>
+      <p style="margin:8px 0 0">Today one tube waited <b>5 hours</b> in a hot courier van before reaching the lab. Waiting too long can change some test results. The quality check passed, and the sample doesn't look damaged.</p>
+    </div></div>`,
+  qs:[
+    {q:"What is the main benefit of automation in the lab?",
+     o:["It replaces the need for any lab staff",
+        "It handles repetitive steps quickly and the same way every time, so people can focus on problems that need judgment",
+        "It makes test results always correct",
+        "It lets patients test themselves at home"],
+     a:1,
+     why:"Automation is strong at speed and consistency on repetitive steps. It doesn't guarantee correct results, and people are still needed to set it up, watch it, and handle the unusual cases."},
+    {q:"Will the release rule catch the problem with the tube that waited 5 hours?",
+     o:["Yes. Software notices anything unusual",
+        "Yes. The quality check would have failed",
+        "No. The rule only checks quality and sample damage. Nobody wrote a step about waiting time, so the result goes out automatically",
+        "No, because rules only work at night"],
+     a:2,
+     why:"A rule checks only what someone thought to include. Nothing in this rule looks at how long the tube waited, so the result is released without a person seeing it. When staff find a gap like this, they update the rule and test it before using it."}
+  ],
+  take:"Automation and rules are fast and consistent, but they are not smart. They only catch the problems someone planned for."
+},
+{
+  title:"The AI That Learned to Sort Cells",
+  area:"Artificial intelligence",
+  emoji:"🧠",
+  learn:`<p><b>Artificial intelligence (AI)</b> here means software that learns patterns from examples instead of following only hand-written rules.</p>
+  <p>Some labs use AI to look at pictures of blood cells taken through a microscope. To teach it, people showed the software many pictures that experts had already labeled. The AI learned what each type of cell tends to look like.</p>
+  <p>The AI then makes a <b>suggestion</b> for each new cell. A trained lab professional reviews the suggestions and corrects any mistakes before the results are sent. This is called keeping a <b>human in the loop</b>.</p>`,
+  sim:()=>`<div class="sim"><div class="sh">WHAT THE AI WAS TRAINED ON (example numbers)</div><div class="sb">
+      <div class="gal"><div><b>50,000</b>pictures of common cell type A</div><div><b>40,000</b>pictures of common cell type B</div><div><b>300</b>pictures of a <u>rare</u> cell type C</div></div>
+      <table style="margin-top:14px"><tr><th>Cell type</th><th>How often the AI agreed with experts in testing</th></tr>
+      <tr><td>Common type A</td><td><span class="chipg cg">very often</span></td></tr>
+      <tr><td>Common type B</td><td><span class="chipg cg">very often</span></td></tr>
+      <tr><td>Rare type C</td><td><span class="chipg ca">less often</span></td></tr></table>
+      <p style="margin:12px 0 0">Rare cells can be the most important ones to catch, because they can signal a serious problem.</p>
+    </div></div>`,
+  qs:[
+    {q:"How did this AI learn to tell cells apart?",
+     o:["Someone typed a description of every cell",
+        "It studied many example pictures that experts had already labeled and learned the patterns",
+        "It guessed randomly until a patient complained",
+        "It copied answers from the internet"],
+     a:1,
+     why:"Learning from many labeled examples is the core idea behind most AI used in labs. What the AI is good at depends on what, and how much, it was shown."},
+    {q:"Which cells is the AI most likely to get wrong, and what keeps patients safe?",
+     o:["Common cells; nothing needs to be done",
+        "Rare cells, because it saw few examples. A trained person reviews and corrects the AI's suggestions",
+        "All cells equally; the lab should stop using microscopes",
+        "None. AI doesn't make mistakes"],
+     a:1,
+     why:"With only a few examples to learn from, the AI is weakest on rare cells, which can matter most. That is why a trained person checks its suggestions instead of reporting them as final."}
+  ],
+  take:"AI is only as good as the examples it learned from. It's often weakest on rare cases, so a person stays in the loop."
+},
+{
+  title:"The New Plates",
+  area:"AI limits & safety",
+  emoji:"🧫",
+  learn:`<p>To check a urine sample for bacteria, a lab spreads a little of it on a <b>culture plate</b>: a dish of gel where bacteria can grow into visible spots called <b>colonies</b>.</p>
+  <p>Some labs use an AI camera system to photograph plates and sort them: <b>growth</b> (a person takes a closer look), <b>no growth</b>, or <b>unsure</b> (a person checks).</p>
+  <p>Before an AI tool is used on patients, it is tested under specific conditions, such as specific brands of plates. Results are only known to be reliable under those same conditions.</p>`,
+  sim:()=>`<div class="sim"><div class="sh">THIS WEEK IN THE MICROBIOLOGY LAB</div><div class="sb">
+      <div class="plates"><figure>${plate("#C9473F",DOTS_A)}<figcaption><b>Brand A plate</b><br>what the AI was trained and tested on</figcaption></figure>
+      <figure>${plate("#D9A43F",DOTS_B)}<figcaption><b>Brand B plate</b><br>new substitute, different color</figcaption></figure></div>
+      <p style="margin:8px 0 0">Brand A plates were out of stock, so the lab started using Brand B on Monday. Since then, the AI has sorted more plates than usual into <span class="chipg cg">no growth</span>. On Brand B, the colonies blend in more with the background.</p>
+    </div></div>`,
+  qs:[
+    {q:"Why might the AI be making mistakes this week?",
+     o:["The AI is tired from working all weekend",
+        "The new plates look different from the examples the AI learned from and was tested on",
+        "AI always gets worse on Mondays",
+        "There is no reason to think anything is wrong"],
+     a:1,
+     why:"AI can struggle when new inputs look different from what it learned on. A color change that a person adjusts to easily can confuse software, and it may not warn anyone."},
+    {q:"What should the lab do?",
+     o:["Keep using the AI as usual. It passed testing before",
+        "Ask the AI whether it is sure",
+        "Have trained staff check the Brand B plates, including ones already sorted, and test the AI on Brand B before trusting it again",
+        "Throw away all the plates"],
+     a:2,
+     why:"When conditions change, the safe choice is to put people back in charge of those samples. That includes rechecking results already sorted, then testing whether the AI works on the new plates. Lab leaders decide when it can be trusted again."}
+  ],
+  take:"An AI tool can only be trusted under the conditions it was tested in. When something changes, people check first."
+}];
+
+const REFL=[
+  "In your own words, what is the difference between automation and AI in a lab?",
+  "Describe one task you would trust a machine to do in a lab, and one you think a person should always check. Why?",
+  "If you worked in a lab and a machine's result looked wrong to you, what would you do?"
+];
+const MIN=60;
+
+const S={screen:"intro",si:0,score:0,ans:SCEN.map(s=>s.qs.map(()=>null)),refl:REFL.map(()=>""),name:""};
+const app=document.getElementById("app");
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function setScore(){let t=0;S.ans.forEach((qs,si)=>qs.forEach((a,qi)=>{if(a===SCEN[si].qs[qi].a)t+=50}));S.score=t;$("#score").textContent=t}
+function go(sc){S.screen=sc;render();window.scrollTo({top:0,behavior:"smooth"})}
+
+function intro(){
+  app.innerHTML=`
+  <section class="card hero">
+    <div class="kick">🏥 Introductory · No medical background needed</div>
+    <h1>Lab AI Rounds</h1>
+    <p>Behind many medical decisions is a laboratory test. Today, machines and artificial intelligence do more and more of that work. In three short stops, you'll learn what they do, where they fall short, and why people still matter.</p>
+    <div class="meta"><span>⏱ 15–20 minutes</span><span>🧪 3 stops</span><span>🏆 300 points</span><span>📝 3 reflections + certificate</span></div>
+    <button class="btn mint" id="go">Begin Rounds ➜</button>
+  </section>
+  <section class="card">
+    <h3>How it works</h3>
+    <div class="terms">
+      <div><b>📖 Learn</b><small>Each stop starts with a short plain-language explanation.</small></div>
+      <div><b>👀 Look</b><small>See a simple example from a lab.</small></div>
+      <div><b>✅ Answer</b><small>Two questions per stop, 50 points each. Everything you need is on the screen.</small></div>
+    </div>
+  </section>`;
+  $("#go").onclick=()=>{S.si=0;go("scen")};
+}
+
+function scen(){
+  const s=SCEN[S.si],A=S.ans[S.si],done=A.every(a=>a!==null);
+  app.innerHTML=`
+  <div class="prog"><span class="lbl">STOP ${S.si+1} OF ${SCEN.length}</span><span class="dots">${SCEN.map((_,i)=>`<i class="${i<=S.si?'on':''}"></i>`).join("")}</span></div>
+  <section class="card">
+    <div class="kick">${s.emoji} ${s.area}</div>
+    <h2>${s.title}</h2>
+    <div class="learn"><div class="kick">📖 Learn</div>${s.learn}</div>
+    <div class="kick" style="margin-top:18px">👀 Look</div>
+    ${s.sim()}
+    ${s.qs.map((q,qi)=>{const a=A[qi],locked=a!==null;
+      return `<div class="q"><div class="pts">QUESTION ${qi+1} · 50 PTS</div><div class="qh">${q.q}</div>
+      ${q.o.map((o,oi)=>`<button class="opt ${locked&&oi===q.a?'right':''} ${locked&&oi===a&&a!==q.a?'wrong':''}" data-q="${qi}" data-o="${oi}" ${locked?"disabled":""}><span class="L">${"ABCD"[oi]}</span><span>${o}</span></button>`).join("")}
+      ${locked?`<div class="fb ${a===q.a?'good':'miss'}"><b class="h">${a===q.a?"Correct · +50":"Not quite · the best answer is "+"ABCD"[q.a]}</b>${q.why}</div>`:""}</div>`}).join("")}
+    ${done?`<div class="take"><b>Key idea:</b> ${s.take}</div>`:""}
+    <div class="row">${done?`<button class="btn" id="next">${S.si<SCEN.length-1?"Next Stop ➜":"Reflection ➜"}</button>`:`<span class="msg">Answer both questions to continue.</span>`}</div>
+  </section>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{A[+b.dataset.q]=+b.dataset.o;setScore();render()});
+  const n=$("#next");if(n)n.onclick=()=>{if(S.si<SCEN.length-1){S.si++;go("scen")}else go("refl")};
+}
+
+function refl(){
+  app.innerHTML=`
+  <div class="prog"><span class="lbl">REFLECTION</span></div>
+  <section class="card">
+    <div class="kick">📝 In your own words</div>
+    <h2>Three short reflections</h2>
+    <p class="msg" style="margin-top:0">Write at least ${MIN} characters for each. There are no wrong answers. Your responses are included in your certificate PDF and aren't saved online.</p>
+    ${REFL.map((r,i)=>`<div class="q"><div class="qh">${i+1}. ${r}</div><textarea data-i="${i}">${esc(S.refl[i])}</textarea><div class="cc" id="cc${i}"></div></div>`).join("")}
+    <div class="row"><button class="btn" id="res" disabled>See My Results ➜</button></div>
+  </section>`;
+  const upd=()=>{S.refl.forEach((t,i)=>{const c=$("#cc"+i);c.textContent=`${t.trim().length} / ${MIN} characters`;c.classList.toggle("ok",t.trim().length>=MIN)});$("#res").disabled=!S.refl.every(t=>t.trim().length>=MIN)};
+  app.querySelectorAll("textarea").forEach(t=>t.oninput=()=>{S.refl[+t.dataset.i]=t.value;upd()});
+  upd();$("#res").onclick=()=>go("results");
+}
+
+function results(){
+  const correct=S.score/50;
+  const title=S.score>=250?"Lab AI Explorer":S.score>=150?"Getting There":"Keep Exploring";
+  app.innerHTML=`
+  <section class="card">
+    <div class="kick">🏁 Rounds Complete</div>
+    <div class="row" style="margin-top:6px;align-items:flex-end;gap:18px"><div class="big">${S.score}</div><div><h2 style="margin:0">${title}</h2><div class="msg" style="margin:0">${correct} of 6 questions correct · 300 possible</div></div></div>
+  </section>
+  <section class="card">
+    <h3>What you learned</h3>
+    <div class="covered">
+      <div>🤖 <b>Automation</b> does repetitive steps quickly and consistently. Rules follow instructions exactly and only catch what people planned for.</div>
+      <div>🧠 <b>AI</b> learns patterns from labeled examples. It's weakest where it had few examples, so a trained person reviews its suggestions.</div>
+      <div>🧫 <b>Conditions matter.</b> An AI tool is trustworthy only under the conditions it was tested in. When something changes, people check first.</div>
+      <div>🗣 <b>People stay responsible.</b> Lab professionals set up the machines, review unusual results, and speak up when something looks wrong.</div>
+    </div>
+    <h3 style="margin-top:20px">Want to go further?</h3>
+    <ul class="links">
+      <li><a href="https://www.captodayonline.com/autoverification-lessons-drawn-from-a-core-lab/" target="_blank" rel="noopener">CAP Today: how one lab uses automatic result rules</a></li>
+      <li><a href="https://www.captodayonline.com/apas-independence-gets-fda-clearance/" target="_blank" rel="noopener">CAP Today: the first FDA-cleared AI culture-plate reader</a></li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Generate your completion certificate</h3>
+    <input type="text" id="nm" placeholder="Your full name" value="${esc(S.name)}">
+    <div class="row"><button class="btn" id="mk">Create Certificate</button><button class="btn ghost" id="again">Retake Rounds</button></div>
+    <div id="certArea"></div>
+  </section>`;
+  $("#nm").oninput=e=>S.name=e.target.value;
+  $("#mk").onclick=makeCert;
+  $("#again").onclick=()=>{Object.assign(S,{si:0,ans:SCEN.map(s=>s.qs.map(()=>null)),refl:REFL.map(()=>"")});setScore();go("intro")};
+}
+
+function makeCert(){
+  const nm=S.name.trim();if(!nm){$("#certArea").innerHTML=`<p class="msg">Enter your name first.</p>`;return}
+  const date=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  const T="Lab AI Rounds: Introduction to AI and Automation in Laboratory Medicine";
+  $("#certArea").innerHTML=`<div class="cert"><div class="kick">Certificate of Completion</div><div class="nm">${esc(nm)}</div>
+    <div>completed <b>${T}</b></div><div style="margin-top:6px">Score: <b>${S.score} / 300</b> · ${date}</div><small>3 stops · 6 questions · 3 reflections</small></div>
+    <div class="row"><button class="btn" id="pdf">Download PDF</button></div><p class="msg" id="pdfmsg"></p>`;
+  $("#pdf").onclick=()=>{
+    try{
+      const {jsPDF}=window.jspdf;const d=new jsPDF({orientation:"landscape",unit:"pt",format:"letter"});
+      const W=d.internal.pageSize.getWidth();
+      d.setDrawColor(0,108,104);d.setLineWidth(4);d.rect(28,28,W-56,d.internal.pageSize.getHeight()-56);d.setLineWidth(1);d.rect(38,38,W-76,d.internal.pageSize.getHeight()-76);
+      d.setFont("helvetica","bold");d.setTextColor(0,108,104);d.setFontSize(14);d.text("CERTIFICATE OF COMPLETION",W/2,110,{align:"center"});
+      d.setTextColor(15,27,45);d.setFontSize(34);d.text(nm,W/2,175,{align:"center"});
+      d.setFont("helvetica","normal");d.setFontSize(15);d.text("has completed",W/2,212,{align:"center"});
+      d.setFont("helvetica","bold");d.setFontSize(17);d.text(d.splitTextToSize(T,W-160),W/2,244,{align:"center"});
+      d.setFont("helvetica","normal");d.setFontSize(14);d.text(`Score: ${S.score} / 300   ·   ${date}`,W/2,300,{align:"center"});
+      d.addPage("letter","portrait");const w2=d.internal.pageSize.getWidth();let y=60;
+      d.setFont("helvetica","bold");d.setFontSize(15);d.text("Reflection responses: "+nm,48,y);y+=26;
+      REFL.forEach((r,i)=>{d.setFont("helvetica","bold");d.setFontSize(11);const ql=d.splitTextToSize(`${i+1}. ${r}`,w2-96);d.text(ql,48,y);y+=ql.length*14+4;
+        d.setFont("helvetica","normal");d.splitTextToSize(S.refl[i].trim(),w2-96).forEach(l=>{if(y>740){d.addPage();y=60}d.text(l,48,y);y+=14});y+=14});
+      d.save(`Lab_AI_Rounds_Intro_Certificate_${nm.replace(/\s+/g,"_")}.pdf`);
+      $("#pdfmsg").textContent="If no download started, your viewer blocks downloads. Take a screenshot of the certificate above, or use the hosted version of this activity.";
+    }catch(e){$("#pdfmsg").textContent="PDF download isn't available in this viewer. Take a screenshot of the certificate above instead."}
+  };
+}
+function render(){({intro,scen,refl,results})[S.screen]()}
+render();
+</script>
+</body>
+</html>

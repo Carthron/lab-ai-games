@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Train the AI: Team Simulation for Laboratory Medicine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0F1B2D;--black:#0B0F14;--teal:#006C68;--mint:#91E2CE;--line:#D5DEE2;--bg:#F3F6F8;--muted:#4A5B6B;
+--red:#B3261E;--redbg:#FCE8E6;--amber:#9A5B00;--amberbg:#FFF3DC;--green:#0E7A4E;--greenbg:#E3F5EC;--blue:#1F4E9A;--bluebg:#E7EEFA}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer}
+.bar{background:var(--black);color:#fff;position:sticky;top:0;z-index:5}
+.bar .in{max-width:980px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar .t{font-weight:800;letter-spacing:.02em}
+.bar .t small{display:block;font-weight:500;color:#9FB0BF;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.score{white-space:nowrap;font-family:"JetBrains Mono",monospace;background:#1B232D;border:1px solid #2C3846;border-radius:8px;padding:6px 12px;font-size:14px}
+.score b{color:var(--mint)}
+.wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px}
+.hero{background:linear-gradient(135deg,#0B0F14 0%,#14303A 100%);color:#fff;border:none;padding:36px 30px}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 12px}
+.hero p{color:#CFDBE2;font-size:17px;max-width:64ch}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.hero .kick{color:var(--mint)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:14px}
+.btn{border:none;border-radius:10px;padding:13px 20px;font-weight:700;font-size:15.5px;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.1)} .btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.mint{background:var(--mint);color:var(--black)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+h2{font-size:clamp(22px,3.2vw,28px);margin:6px 0 6px;line-height:1.2}
+h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.terms div{background:var(--bg);border-radius:12px;padding:14px}
+.terms b{display:block;margin-bottom:4px}
+.terms small{color:var(--muted);font-size:14px}
+.prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.prog .lbl{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.dots{display:flex;gap:6px}.dots i{width:34px;height:6px;border-radius:6px;background:var(--line)}.dots i.on{background:var(--teal)}
+.story{font-size:16.5px}
+/* LIS screen */
+.lis{border-radius:12px;overflow:hidden;border:1px solid #23303D;margin:16px 0;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:#0E141B;color:#D7E1EA}
+.lis .head{background:#000;padding:9px 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700;font-size:12.5px;letter-spacing:.06em}
+.lis .head .sys{color:var(--mint)}
+.lis .body{padding:14px;overflow-x:auto}
+.lis table{border-collapse:collapse;width:100%;min-width:520px}
+.lis td,.lis th{padding:6px 8px;border-bottom:1px solid #1F2A36;text-align:left;white-space:nowrap}
+.lis th{color:#8DA0B3;font-weight:500;font-size:12px}
+.hi{color:#FF8A80;font-weight:700}.lo{color:#82B1FF;font-weight:700}
+.flag{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:700}
+.f-red{background:#5A1714;color:#FFB4AB}.f-amb{background:#4A3300;color:#FFD38A}.f-grn{background:#0D3B28;color:#9FE6BF}.f-blu{background:#14294D;color:#A9C4FF}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 18px;margin-bottom:10px}
+.kv div span{color:#8DA0B3}
+.note{margin-top:10px;border-left:3px solid var(--mint);padding:6px 10px;background:#121C25;color:#BFD0DD;white-space:normal}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:10px}
+.cell{background:#16202B;border-radius:10px;padding:10px;text-align:center;font-size:12px}
+.cell svg{display:block;margin:0 auto 6px}
+/* questions */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+.q .qh{font-weight:700;font-size:16.5px;margin-bottom:12px}
+.q .pts{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.06em}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt .L{flex:none;width:26px;height:26px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-weight:800;font-size:13px}
+.opt.right{border-color:var(--green);background:var(--greenbg)} .opt.right .L{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--redbg)} .opt.wrong .L{background:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;border-radius:10px;padding:12px 14px;font-size:15px;animation:pop .25s ease}
+.fb.good{background:var(--greenbg);border-left:4px solid var(--green)}
+.fb.miss{background:var(--amberbg);border-left:4px solid var(--amber)}
+.fb b.h{display:block;margin-bottom:2px}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.take{background:var(--bluebg);border-radius:12px;padding:16px;margin-top:18px}
+.take b{color:var(--blue)}
+textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:15px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+.cc{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);text-align:right}
+.cc.ok{color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.big{font-size:60px;font-weight:800;color:var(--teal);line-height:1;font-family:"JetBrains Mono",monospace}
+.covered{display:grid;gap:10px;margin-top:10px}
+.covered div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px}
+input[type=text]{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:16px}
+.cert{border:3px double var(--teal);border-radius:14px;padding:28px;text-align:center;margin-top:16px;background:#FBFDFD}
+.cert .nm{font-size:30px;font-weight:800;margin:8px 0}
+.cert small{color:var(--muted)}
+.links a{color:var(--teal);font-weight:600}
+.links li{margin:6px 0}
+.hidden{display:none!important}
+.msg{font-size:14px;color:var(--muted);margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 18px 30px}
+</style>
+<style>
+.learn{background:#F0FAF8;border:1.5px solid #BFE6DC;border-radius:14px;padding:20px;margin:14px 0}
+.learn .kick{margin-bottom:6px}
+.learn p{margin:6px 0;font-size:16px}
+.pipe{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.pipe div{flex:1;min-width:110px;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.pipe div b{display:block;font-size:26px;margin-bottom:4px}
+.pipe .ar{flex:0;min-width:0;border:none;background:none;display:grid;place-items:center;font-size:22px;color:var(--teal);padding:0}
+.sim{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0;background:#fff}
+.sim .sh{background:var(--black);color:#fff;padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;font-family:"JetBrains Mono",monospace}
+.sim .sb{padding:16px}
+.sim table{width:100%;border-collapse:collapse;font-size:15px}
+.sim td,.sim th{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+.sim th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chipg{display:inline-block;border-radius:6px;padding:2px 9px;font-size:13px;font-weight:700}
+.cg{background:var(--greenbg);color:var(--green)}.ca{background:var(--amberbg);color:var(--amber)}.cr{background:var(--redbg);color:var(--red)}
+.rule{font-family:"JetBrains Mono",monospace;font-size:14px;background:var(--bg);border-radius:10px;padding:12px 14px;margin:10px 0;line-height:1.7}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:8px}
+.gal div{background:var(--bg);border-radius:12px;padding:12px;text-align:center;font-size:14px}
+.gal b{display:block;font-size:24px;color:var(--teal)}
+.plates{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+.plates figure{margin:0;text-align:center;font-size:14px}
+</style>
+<style>
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
+.roles div{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.roles b{display:block;font-size:16px}
+.members{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
+.members input{max-width:none}
+.huddle{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:#FFF8E6;border:1.5px solid #F2D9A0;border-radius:12px;padding:14px 16px;margin:14px 0;font-size:15.5px}
+.huddle b{color:var(--amber)}
+.tbtn{border:1.5px solid var(--amber);background:#fff;color:var(--amber);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.tbtn.run{background:var(--amber);color:#fff}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+@media(max-width:640px){.types{grid-template-columns:1fr}}
+.type{background:var(--bg);border-radius:12px;padding:14px;text-align:center}
+.type svg{display:block;margin:0 auto 6px}
+.type b{display:block;font-size:17px}
+.type small{color:var(--muted)}
+.slider{margin:16px 0}
+.slider label{display:flex;justify-content:space-between;font-weight:700;font-size:15.5px;margin-bottom:6px}
+.slider label span{font-family:"JetBrains Mono",monospace;color:var(--teal)}
+input[type=range]{width:100%;accent-color:#006C68}
+.budget{font-family:"JetBrains Mono",monospace;font-size:15px;padding:10px 14px;border-radius:10px;background:var(--bg);margin-top:6px}
+.budget.over{background:var(--redbg);color:var(--red);font-weight:700}
+.bars{display:grid;gap:12px;margin:12px 0}
+.barrow{display:grid;grid-template-columns:130px 1fr 60px;gap:10px;align-items:center;font-size:15px}
+.track{height:22px;background:var(--bg);border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px;transition:width .6s ease}
+.pct{font-family:"JetBrains Mono",monospace;font-weight:700;text-align:right}
+.safe{display:grid;gap:8px;margin:12px 0}
+.safe label{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:15.5px;background:#fff}
+.safe input{margin-top:4px;accent-color:#006C68;transform:scale(1.2)}
+.safe label.ok{border-color:var(--green);background:var(--greenbg)} .safe label.bad{border-color:var(--red);background:var(--redbg)} .safe label.missed{border-color:var(--amber);background:var(--amberbg)}
+.safe small{display:block;color:var(--muted);margin-top:4px}
+.summary{white-space:pre-wrap;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:var(--bg);border-radius:10px;padding:14px}
+.simnote{font-size:13.5px;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="t">🧠 Train the AI<small>Team simulation · AI in the Lab</small></div>
+  <div class="score">TEAM <b id="score">0</b> / 300</div>
+</div></div>
+<div class="wrap" id="app"></div>
+<footer>A simplified simulation for learning. The cell types and accuracy numbers are invented to show how AI training works; real systems are more complex.</footer>
+<script>
+const ROLES=[["📖 Reader","Reads each screen out loud."],["🖱️ Driver","Moves the sliders and enters choices."],["📊 Analyst","Explains what the results chart shows."],["🎤 Presenter","Shares the team's story in the report-out."]];
+const shape=(k,col)=>{const c=col||"#7B4FA6";
+ if(k==="R")return `<svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="26" fill="#C9DDF2"/><circle cx="35" cy="35" r="15" fill="${c}"/></svg>`;
+ if(k==="O")return `<svg width="70" height="70" viewBox="0 0 70 70"><ellipse cx="35" cy="35" rx="29" ry="20" fill="#C9DDF2"/><ellipse cx="35" cy="35" rx="17" ry="9" fill="${c}"/></svg>`;
+ return `<svg width="70" height="70" viewBox="0 0 70 70"><circle cx="35" cy="35" r="27" fill="#C9DDF2"/><polygon points="35,14 40,29 56,29 43,38 48,54 35,44 22,54 27,38 14,29 30,29" fill="${c}"/></svg>`};
+const TYPES=[{k:"R",name:"Round cell",note:"very common"},{k:"O",name:"Oval cell",note:"common"},{k:"S",name:"Star cell",note:"rare, but important to catch"}];
+const BUDGET=1000;
+// toy learning curve: accuracy rises with examples, with diminishing returns
+const learn=n=>Math.round(50+47*(1-Math.exp(-n/110)));
+const SAFE=[
+ {t:"A trained person reviews every cell the AI calls a Star cell",ok:true,why:"Rare, important calls get a human check."},
+ {t:"Recheck the AI whenever the lab changes cameras, stains, or supplies",ok:true,why:"Changed conditions can quietly lower accuracy."},
+ {t:"Use the AI's answers with no human review, to save time",ok:false,why:"Nobody would catch the AI's mistakes."},
+ {t:"Collect more Star cell pictures and retrain the AI over time",ok:true,why:"More examples of rare cases make the AI stronger where it's weakest."},
+ {t:"Tell lab staff which cell types the AI struggles with",ok:true,why:"People review better when they know the tool's weak spots."},
+ {t:"Trust the AI on new cameras because it scored well on the old one",ok:false,why:"Good results under old conditions don't guarantee good results under new ones."}];
+const QUIZ=[
+ {q:"Why did the AI do worse on Star cells than on Round cells?",o:["Star cells are shaped wrong","It had fewer Star cell examples to learn from","AI doesn't like stars","The screen was too small"],a:1,ex:"An AI learns from examples. Fewer examples usually means weaker performance on that type."},
+ {q:"Why did accuracy drop with the new camera?",o:["The new pictures looked different from the training pictures","The AI forgot everything","Cameras always break AI","Accuracy never changes"],a:0,ex:"When new inputs look different from training examples, an AI can struggle, often without warning anyone."}];
+
+const S={screen:"setup",team:"",members:["","","",""],score:0,round:1,mix:{R:600,O:350,S:50},variety:0,runs:[],safe:SAFE.map(()=>false),safeChecked:false,quiz:QUIZ.map(()=>null),timer:null,tleft:0};
+const app=document.getElementById("app");const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function go(s){stopT();S.screen=s;render();window.scrollTo({top:0,behavior:"smooth"})}
+function stopT(){clearInterval(S.timer);S.timer=null}
+function huddle(prompt,secs){return `<div class="huddle"><span>🗣 <b>Team huddle:</b> ${prompt}</span><button class="tbtn" id="tbtn" data-s="${secs}">Start ${secs/60}-min timer</button></div>`}
+function wireTimer(){const b=$("#tbtn");if(!b)return;b.onclick=()=>{if(S.timer){stopT();b.textContent=`Start ${b.dataset.s/60}-min timer`;b.classList.remove("run");return}
+ S.tleft=+b.dataset.s;b.classList.add("run");const tick=()=>{const m=Math.floor(S.tleft/60),s=S.tleft%60;b.textContent=S.tleft>0?`⏱ ${m}:${String(s).padStart(2,"0")} (tap to stop)`:"⏰ Time! Decide as a team";if(S.tleft<=0){clearInterval(S.timer);S.timer=null;return}S.tleft--};tick();S.timer=setInterval(tick,1000)}}
+function prog(i,label){return `<div class="prog"><span class="lbl">${label}</span><span class="dots">${[0,1,2,3].map(k=>`<i class="${k<=i?'on':''}"></i>`).join("")}</span></div>`}
+
+function simulate(mix,variety){
+ const old={},nw={};
+ TYPES.forEach(t=>{old[t.k]=learn(mix[t.k]);
+  // new camera: only the share of varied pictures prepares the AI for it
+  nw[t.k]=Math.round(old[t.k]-(old[t.k]-50)*0.55*(1-variety/100))});
+ return {old,nw};
+}
+function trainScore(r){ // up to 150: based on Star accuracy with new camera and weakest type
+ const minNew=Math.min(...Object.values(r.nw));
+ return Math.max(0,Math.min(150,Math.round((minNew-50)/(95-50)*150)));
+}
+function calc(){let t=0;
+ if(S.runs.length) t+=Math.max(...S.runs.map(trainScore));
+ if(S.safeChecked) S.safe.forEach((v,i)=>{if(v&&SAFE[i].ok)t+=25;if(v&&!SAFE[i].ok)t-=25});
+ S.quiz.forEach((v,i)=>{if(v===QUIZ[i].a)t+=25});
+ S.score=Math.max(0,Math.min(300,t));$("#score").textContent=S.score}
+
+function setup(){
+ app.innerHTML=`
+ <section class="card hero">
+  <div class="kick">👥 Team simulation · No medical background needed</div>
+  <h1>Train the AI</h1>
+  <p>Your team is building an AI that looks at pictures of cells and sorts them by type. You choose what it learns from, test it, see where it fails, and decide the safety rules before it's used in a lab.</p>
+  <div class="meta"><span>👥 Teams of 4</span><span>⏱ About 20 minutes</span><span>🧪 4 stages</span><span>🏆 300 points</span></div>
+ </section>
+ <section class="card">
+  <h3>Set up your team</h3>
+  <input type="text" id="team" placeholder="Team name" value="${esc(S.team)}">
+  <div class="members">${S.members.map((m,i)=>`<input type="text" data-m="${i}" placeholder="${ROLES[i][0].slice(3)}: name" value="${esc(m)}">`).join("")}</div>
+  <h3 style="margin-top:20px">Team roles</h3>
+  <div class="roles">${ROLES.map(r=>`<div><b>${r[0]}</b>${r[1]}</div>`).join("")}</div>
+  <p class="msg">Teams of 3 or 5: combine Reader and Analyst, or add a second Presenter.</p>
+  <div class="row"><button class="btn" id="go">Meet the task ➜</button></div>
+ </section>`;
+ $("#team").oninput=e=>S.team=e.target.value;
+ app.querySelectorAll("[data-m]").forEach(i=>i.oninput=e=>S.members[+i.dataset.m]=e.target.value);
+ $("#go").onclick=()=>{if(!S.team.trim()){$("#team").focus();$("#team").placeholder="Team name (required)";return}go("meet")};
+}
+
+function meet(){
+ app.innerHTML=`${prog(0,"STAGE 1 OF 4 · MEET THE TASK")}
+ <section class="card">
+  <div class="kick">📖 Learn</div><h2>How does an AI learn?</h2>
+  <div class="learn">
+   <p>An AI doesn't come knowing anything. People <b>train</b> it by showing it many example pictures that experts have already labeled ("this is a Round cell," "this is a Star cell"). The AI finds patterns in those examples.</p>
+   <p>Afterward, it's <b>tested</b> on pictures it has never seen, to measure how often it gets them right. That number is its <b>accuracy</b>.</p>
+   <p>Your AI must sort three kinds of cells:</p>
+  </div>
+  <div class="types">${TYPES.map(t=>`<div class="type">${shape(t.k)}<b>${t.name}</b><small>${t.note}</small></div>`).join("")}</div>
+  <p>In real labs, a rare cell type can be a sign of a serious illness. Missing it matters more than missing a common one.</p>
+  <div class="row"><button class="btn" id="go">Choose training pictures ➜</button></div>
+ </section>`;
+ $("#go").onclick=()=>go("train");
+}
+
+function train(){
+ const total=S.mix.R+S.mix.O+S.mix.S,over=total>BUDGET;
+ const prev=S.runs.length?S.runs[S.runs.length-1]:null;
+ app.innerHTML=`${prog(1,`STAGE 2 OF 4 · TRAINING ROUND ${S.runs.length+1} OF 2`)}
+ <section class="card">
+  <div class="kick">🎛 Your choices</div><h2>Pick your ${BUDGET.toLocaleString()} training pictures</h2>
+  <p>Collecting labeled pictures takes experts' time, so you only have a budget of <b>${BUDGET.toLocaleString()}</b>. In real life, rare Star cells are hard to find, so most available pictures are Round or Oval cells.</p>
+  ${S.runs.length===0?huddle("How should you split the budget? What happens if you barely include Star cells?",180):huddle("Look at your last results. What would you change for round 2?",120)}
+  ${TYPES.map(t=>`<div class="slider"><label>${t.name} pictures <span id="v${t.k}">${S.mix[t.k]}</span></label><input type="range" min="0" max="1000" step="10" value="${S.mix[t.k]}" data-k="${t.k}"></div>`).join("")}
+  <div class="slider"><label>Pictures taken with different cameras and stains <span id="vV">${S.variety}%</span></label><input type="range" min="0" max="100" step="10" value="${S.variety}" id="var">
+   <div class="simnote">0% means all pictures come from one camera in one lab. Variety doesn't cost extra, but you have to choose to collect it.</div></div>
+  <div class="budget ${over?'over':''}" id="bud">Used: ${total} / ${BUDGET}${over?" · over budget":""}</div>
+  ${prev?`<p class="msg">Last round your weakest type scored ${Math.min(...Object.values(prev.nw))}% on the new camera.</p>`:""}
+  <div class="row"><button class="btn" id="run" ${over?"disabled":""}>Train and test the AI ➜</button></div>
+ </section>`;
+ wireTimer();
+ app.querySelectorAll("input[type=range][data-k]").forEach(r=>r.oninput=()=>{S.mix[r.dataset.k]=+r.value;$("#v"+r.dataset.k).textContent=r.value;const t=S.mix.R+S.mix.O+S.mix.S;const b=$("#bud");b.textContent=`Used: ${t} / ${BUDGET}${t>BUDGET?" · over budget":""}`;b.classList.toggle("over",t>BUDGET);$("#run").disabled=t>BUDGET});
+ $("#var").oninput=e=>{S.variety=+e.target.value;$("#vV").textContent=S.variety+"%"};
+ $("#run").onclick=()=>{S.runs.push({mix:{...S.mix},variety:S.variety,...simulate(S.mix,S.variety)});calc();go("results")};
+}
+
+function bars(vals,color){return `<div class="bars">${TYPES.map(t=>{const v=vals[t.k];const c=v>=90?"#0E7A4E":v>=75?"#C77700":"#B3261E";return `<div class="barrow"><span>${t.name}</span><div class="track"><div class="fill" style="width:${v}%;background:${c}"></div></div><span class="pct">${v}%</span></div>`}).join("")}</div>`}
+
+function results(){
+ const r=S.runs[S.runs.length-1],ts=trainScore(r),canRetrain=S.runs.length<2;
+ app.innerHTML=`${prog(2,`STAGE 3 OF 4 · TEST RESULTS (ROUND ${S.runs.length})`)}
+ <section class="card">
+  <div class="kick">📊 Analyst: explain these results to the team</div><h2>Test 1: the same camera it trained on</h2>
+  ${bars(r.old)}
+  <h2 style="margin-top:22px">Test 2: the lab buys a new camera 📷</h2>
+  <p>Pictures from the new camera are slightly brighter and a different color. Same cells, different look:</p>
+  <div class="types"><div class="type">${shape("S","#7B4FA6")}<b>Old camera</b></div><div class="type">${shape("S","#C07AD8")}<b>New camera</b></div><div class="type" style="display:grid;place-items:center"><small>Accuracy depends on whether your training included varied cameras and stains (you chose ${r.variety}%).</small></div></div>
+  ${bars(r.nw)}
+  <div class="take"><b>What this shows:</b> ${r.nw.S<r.nw.R-5?"The AI is weakest on Star cells, the rare type it saw least. ":""}${r.variety<50?"Without much variety in training, accuracy dropped with the new camera. ":"Including varied pictures helped the AI handle the new camera. "}Training points this round: <b>${ts} / 150</b>, based on your weakest cell type with the new camera.${S.runs.length>1?" Your better round counts.":""}</div>
+  <p class="simnote">Simulated numbers for learning purposes only.</p>
+  <div class="row">${canRetrain?`<button class="btn ghost" id="retrain">Try one more training round</button>`:""}<button class="btn" id="next">Set the safety rules ➜</button></div>
+ </section>`;
+ const rt=$("#retrain");if(rt)rt.onclick=()=>go("train");
+ $("#next").onclick=()=>go("safety");
+}
+
+function safety(){
+ const done=S.safeChecked,allQ=S.quiz.every(v=>v!==null);
+ app.innerHTML=`${prog(3,"STAGE 4 OF 4 · SAFETY RULES")}
+ <section class="card">
+  <div class="kick">🛡 Before the AI is used in a real lab</div><h2>Choose your safety rules</h2>
+  <p>Even a well-trained AI makes mistakes. Pick every rule your team would require. <b>+25</b> for each good rule, <b>−25</b> for each risky one.</p>
+  ${huddle("Discuss each rule. Would you want it in place if the AI were checking your own sample?",180)}
+  <div class="safe">${SAFE.map((s,i)=>{let c="";if(done){if(S.safe[i]&&s.ok)c="ok";else if(S.safe[i]&&!s.ok)c="bad";else if(!S.safe[i]&&s.ok)c="missed"}
+   return `<label class="${c}"><input type="checkbox" data-i="${i}" ${S.safe[i]?"checked":""} ${done?"disabled":""}><span>${s.t}${done?`<small>${s.ok?(S.safe[i]?"✅ Good rule. ":"↪ Missed a good rule. "):(S.safe[i]?"⚠ Risky. ":"✅ Right to skip. ")}${s.why}</small>`:""}</span></label>`}).join("")}</div>
+  ${done?"":`<div class="row"><button class="btn" id="lock">Lock in our rules</button></div>`}
+  ${done?`<h2 style="margin-top:24px">Quick check</h2>${QUIZ.map((q,qi)=>{const a=S.quiz[qi],l=a!==null;return `<div class="q"><div class="pts">25 PTS</div><div class="qh">${q.q}</div>
+   ${q.o.map((o,oi)=>`<button class="opt ${l&&oi===q.a?'right':''} ${l&&oi===a&&a!==q.a?'wrong':''}" data-q="${qi}" data-o="${oi}" ${l?"disabled":""}><span class="L">${"ABCD"[oi]}</span><span>${o}</span></button>`).join("")}
+   ${l?`<div class="fb ${a===q.a?'good':'miss'}"><b class="h">${a===q.a?"Correct · +25":"Not quite · best answer: "+"ABCD"[q.a]}</b>${q.ex}</div>`:""}</div>`}).join("")}
+   <div class="row">${allQ?`<button class="btn" id="next">See our results ➜</button>`:""}</div>`:""}
+ </section>`;
+ wireTimer();
+ app.querySelectorAll("input[type=checkbox]").forEach(c=>c.onchange=()=>{S.safe[+c.dataset.i]=c.checked});
+ const l=$("#lock");if(l)l.onclick=()=>{S.safeChecked=true;calc();render()};
+ app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{S.quiz[+b.dataset.q]=+b.dataset.o;calc();render()});
+ const n=$("#next");if(n)n.onclick=()=>go("done");
+}
+
+function done(){
+ const best=S.runs.reduce((a,r)=>trainScore(r)>trainScore(a)?r:a,S.runs[0]);
+ const names=S.members.filter(m=>m.trim()).join(", ")||"(not entered)";
+ const good=S.safe.filter((v,i)=>v&&SAFE[i].ok).length,risky=S.safe.filter((v,i)=>v&&!SAFE[i].ok).length;
+ const sum=`Team: ${S.team}\nMembers: ${names}\nScore: ${S.score} / 300\nBest training mix: Round ${best.mix.R}, Oval ${best.mix.O}, Star ${best.mix.S}, variety ${best.variety}%\nStar cell accuracy, new camera: ${best.nw.S}%\nSafety rules: ${good} good, ${risky} risky\nTraining rounds used: ${S.runs.length}`;
+ app.innerHTML=`
+ <section class="card">
+  <div class="kick">🏁 Simulation complete</div>
+  <div class="row" style="margin-top:6px;align-items:flex-end;gap:18px"><div class="big">${S.score}</div><div><h2 style="margin:0">${esc(S.team)}</h2><div class="msg" style="margin:0">out of 300 points</div></div></div>
+ </section>
+ <section class="card">
+  <h3>🎤 Presenter: report out to the class</h3>
+  <div class="covered">
+   <div>1. How did your team split the training pictures, and why?</div>
+   <div>2. What happened when the lab got a new camera?</div>
+   <div>3. Which safety rule matters most to your team, and why?</div>
+  </div>
+  <h3 style="margin-top:20px">Team summary</h3>
+  <div class="summary">${esc(sum)}</div>
+  <div class="row"><button class="btn" id="copy">Copy summary</button><button class="btn ghost" id="again">Play again</button></div>
+  <p class="msg" id="cmsg">Copy the summary to send to your instructor, or take a screenshot of this screen.</p>
+ </section>
+ <section class="card">
+  <h3>Key ideas</h3>
+  <div class="covered">
+   <div>📚 <b>AI learns from examples.</b> What it's good at depends on what, and how many, examples it saw.</div>
+   <div>⭐ <b>Rare cases are hardest,</b> and they're often the ones that matter most.</div>
+   <div>📷 <b>Changes in conditions,</b> like a new camera, can lower accuracy without warning.</div>
+   <div>🧑‍🔬 <b>People set the safety rules</b> and review the AI's work.</div>
+  </div>
+ </section>`;
+ $("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(sum);$("#cmsg").textContent="Copied. Paste it wherever your instructor asked."}catch(e){$("#cmsg").textContent="Copying isn't available here. Take a screenshot instead."}};
+ $("#again").onclick=()=>{Object.assign(S,{mix:{R:600,O:350,S:50},variety:0,runs:[],safe:SAFE.map(()=>false),safeChecked:false,quiz:QUIZ.map(()=>null)});calc();go("setup")};
+}
+function render(){({setup,meet,train,results,safety,done})[S.screen]()}
+render();
+</script>
+</body>
+</html>
