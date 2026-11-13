@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab AI Rounds: AI and Automation in Laboratory Medicine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--ink:#0F1B2D;--black:#0B0F14;--teal:#006C68;--mint:#91E2CE;--line:#D5DEE2;--bg:#F3F6F8;--muted:#4A5B6B;
+--red:#B3261E;--redbg:#FCE8E6;--amber:#9A5B00;--amberbg:#FFF3DC;--green:#0E7A4E;--greenbg:#E3F5EC;--blue:#1F4E9A;--bluebg:#E7EEFA}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.5}
+button{font:inherit;cursor:pointer}
+.bar{background:var(--black);color:#fff;position:sticky;top:0;z-index:5}
+.bar .in{max-width:980px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar .t{font-weight:800;letter-spacing:.02em}
+.bar .t small{display:block;font-weight:500;color:#9FB0BF;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.score{white-space:nowrap;font-family:"JetBrains Mono",monospace;background:#1B232D;border:1px solid #2C3846;border-radius:8px;padding:6px 12px;font-size:14px}
+.score b{color:var(--mint)}
+.wrap{max-width:980px;margin:0 auto;padding:22px 18px 60px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:18px}
+.hero{background:linear-gradient(135deg,#0B0F14 0%,#14303A 100%);color:#fff;border:none;padding:36px 30px}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.08;margin:8px 0 12px}
+.hero p{color:#CFDBE2;font-size:17px;max-width:64ch}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--teal)}
+.hero .kick{color:var(--mint)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 22px}
+.meta span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:14px}
+.btn{border:none;border-radius:10px;padding:13px 20px;font-weight:700;font-size:15.5px;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.1)} .btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.mint{background:var(--mint);color:var(--black)}
+.btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+h2{font-size:clamp(22px,3.2vw,28px);margin:6px 0 6px;line-height:1.2}
+h3{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.terms div{background:var(--bg);border-radius:12px;padding:14px}
+.terms b{display:block;margin-bottom:4px}
+.terms small{color:var(--muted);font-size:14px}
+.prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.prog .lbl{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.dots{display:flex;gap:6px}.dots i{width:34px;height:6px;border-radius:6px;background:var(--line)}.dots i.on{background:var(--teal)}
+.story{font-size:16.5px}
+/* LIS screen */
+.lis{border-radius:12px;overflow:hidden;border:1px solid #23303D;margin:16px 0;font-family:"JetBrains Mono",monospace;font-size:13.5px;background:#0E141B;color:#D7E1EA}
+.lis .head{background:#000;padding:9px 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:700;font-size:12.5px;letter-spacing:.06em}
+.lis .head .sys{color:var(--mint)}
+.lis .body{padding:14px;overflow-x:auto}
+.lis table{border-collapse:collapse;width:100%;min-width:520px}
+.lis td,.lis th{padding:6px 8px;border-bottom:1px solid #1F2A36;text-align:left;white-space:nowrap}
+.lis th{color:#8DA0B3;font-weight:500;font-size:12px}
+.hi{color:#FF8A80;font-weight:700}.lo{color:#82B1FF;font-weight:700}
+.flag{display:inline-block;border-radius:5px;padding:1px 7px;font-size:11.5px;font-weight:700}
+.f-red{background:#5A1714;color:#FFB4AB}.f-amb{background:#4A3300;color:#FFD38A}.f-grn{background:#0D3B28;color:#9FE6BF}.f-blu{background:#14294D;color:#A9C4FF}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:4px 18px;margin-bottom:10px}
+.kv div span{color:#8DA0B3}
+.note{margin-top:10px;border-left:3px solid var(--mint);padding:6px 10px;background:#121C25;color:#BFD0DD;white-space:normal}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;margin-top:10px}
+.cell{background:#16202B;border-radius:10px;padding:10px;text-align:center;font-size:12px}
+.cell svg{display:block;margin:0 auto 6px}
+/* questions */
+.q{border:1.5px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+.q .qh{font-weight:700;font-size:16.5px;margin-bottom:12px}
+.q .pts{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--teal);font-weight:700;letter-spacing:.06em}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:15px;color:var(--ink)}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt .L{flex:none;width:26px;height:26px;border-radius:7px;background:var(--bg);display:grid;place-items:center;font-weight:800;font-size:13px}
+.opt.right{border-color:var(--green);background:var(--greenbg)} .opt.right .L{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--redbg)} .opt.wrong .L{background:var(--red);color:#fff}
+.opt:disabled{cursor:default}
+.fb{margin-top:10px;border-radius:10px;padding:12px 14px;font-size:15px;animation:pop .25s ease}
+.fb.good{background:var(--greenbg);border-left:4px solid var(--green)}
+.fb.miss{background:var(--amberbg);border-left:4px solid var(--amber)}
+.fb b.h{display:block;margin-bottom:2px}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.take{background:var(--bluebg);border-radius:12px;padding:16px;margin-top:18px}
+.take b{color:var(--blue)}
+textarea{width:100%;min-height:110px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:15px;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--teal)}
+.cc{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);text-align:right}
+.cc.ok{color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.big{font-size:60px;font-weight:800;color:var(--teal);line-height:1;font-family:"JetBrains Mono",monospace}
+.covered{display:grid;gap:10px;margin-top:10px}
+.covered div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:15px}
+input[type=text]{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:16px}
+.cert{border:3px double var(--teal);border-radius:14px;padding:28px;text-align:center;margin-top:16px;background:#FBFDFD}
+.cert .nm{font-size:30px;font-weight:800;margin:8px 0}
+.cert small{color:var(--muted)}
+.links a{color:var(--teal);font-weight:600}
+.links li{margin:6px 0}
+.hidden{display:none!important}
+.msg{font-size:14px;color:var(--muted);margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:0 18px 30px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="t">🧪 Lab AI Rounds<small>AI &amp; Automation in Laboratory Medicine</small></div>
+  <div class="score">SCORE <b id="score">0</b> / 300</div>
+</div></div>
+<div class="wrap" id="app"></div>
+<footer>Fictional patients and cases for education. Not a clinical decision tool. Lab policies, rules, and thresholds vary by institution.</footer>
+
+<script>
+// ---------------- Content ----------------
+const SCEN = [
+{
+  title:"The Potassium That Released Itself",
+  area:"Clinical Chemistry · Automated line + autoverification",
+  emoji:"⚗️",
+  story:`You're shadowing in a hospital core lab. Specimens ride a conveyor track from the centrifuge to the analyzers, and most normal results are <b>autoverified</b>: middleware software checks each result against rules the lab wrote and releases it to the patient's chart without a person reviewing it. At 1:24 p.m., a basic metabolic panel from an outpatient clinic posts with a critical potassium.`,
+  screen:()=>`<div class="lis"><div class="head"><span class="sys">LIS · CHEMISTRY RESULTS</span><span>ACC# C-48213 · AUTOVERIFIED 13:24</span></div><div class="body">
+    <div class="kv"><div><span>Patient:</span> J.T., 58 M (fictional)</div><div><span>Source:</span> Outpatient clinic</div>
+    <div><span>Collected:</span> 07:42</div><div><span>Received in lab:</span> <span class="hi">13:06</span></div>
+    <div><span>Tube:</span> SST, not spun at clinic</div><div><span>Prior results:</span> none on file</div></div>
+    <table><tr><th>TEST</th><th>RESULT</th><th>REF RANGE</th><th>FLAG</th></tr>
+    <tr><td>Sodium</td><td>139</td><td>135–145 mmol/L</td><td></td></tr>
+    <tr><td>Potassium</td><td class="hi">6.8</td><td>3.5–5.1 mmol/L</td><td><span class="flag f-red">CRITICAL</span></td></tr>
+    <tr><td>Chloride</td><td>103</td><td>98–107 mmol/L</td><td></td></tr>
+    <tr><td>CO2</td><td>25</td><td>22–29 mmol/L</td><td></td></tr>
+    <tr><td>Glucose</td><td class="lo">58</td><td>70–99 mg/dL</td><td><span class="flag f-blu">LOW</span></td></tr>
+    <tr><td>Creatinine</td><td>0.9</td><td>0.7–1.3 mg/dL</td><td></td></tr>
+    <tr><td>Hemolysis index</td><td>12</td><td>rule limit for K: 50</td><td><span class="flag f-grn">PASS</span></td></tr></table>
+    <div class="note">Autoverification log: QC in range ✓ · H-index below K limit ✓ · Delta check: no prior result, skipped · Critical value → added to call queue</div>
+  </div></div>`,
+  qs:[
+    {q:"Kidney function is normal, the sample isn't hemolyzed, and the patient is an outpatient. What best explains the high potassium and low glucose together?",
+     o:["The patient has true, dangerous hyperkalemia and hypoglycemia",
+        "A delayed-processing artifact: the tube sat unspun for over 5 hours, so cells leaked potassium and kept consuming glucose",
+        "The analyzer's AI misread the specimen barcode",
+        "Autoverification changes results when it releases them"],
+     a:1,
+     why:"Whole blood that sits too long before it's separated can show falsely high potassium (cells leak it) and falsely low glucose (cells keep using it). The collection-to-receipt gap of about 5.5 hours is the clue. A true critical value is still possible, so the patient's provider needs to know, but the pattern points to a preanalytical problem."},
+    {q:"The result has already posted to the chart. What is the best response?",
+     o:["Quietly delete the result so no one acts on it",
+        "Trust it. QC passed and the hemolysis check passed, so the software was right",
+        "Contact the ordering provider about the likely artifact, follow the lab's corrected-report process, request a recollection, and report the rule gap to the people who own the autoverification rules",
+        "Turn off autoverification for the whole lab"],
+     a:2,
+     why:"Results aren't deleted; labs use documented correction and communication processes. The bigger lesson is that the rules only checked what they were built to check. Hemolysis was screened, but transport delay wasn't. Rule changes are designed, tested, and approved by the lab before they go live, which is what guidance such as CLSI AUTO15 describes."}
+  ],
+  take:"Automation and autoverification are rule-based. They're fast and consistent, but they only catch the problems someone anticipated and programmed. People still own the rules, review the exceptions, and fix the gaps."
+},
+{
+  title:"The Smear the Software Sorted",
+  area:"Hematology · Digital morphology with AI pre-classification",
+  emoji:"🔬",
+  story:`A CBC from the emergency department triggered the analyzer's flag for possible abnormal cells, so a blood smear was made and scanned by a <b>digital morphology system</b>. Its neural-network software locates white blood cells, photographs them, and <b>pre-classifies</b> each one. A trained technologist then reviews the images and verifies or changes every classification before anything is reported.`,
+  screen:()=>`<div class="lis"><div class="head"><span class="sys">DIGITAL MORPHOLOGY · PRE-CLASSIFICATION</span><span>SLIDE H-20931 · AWAITING TECH REVIEW</span></div><div class="body">
+    <div class="kv"><div><span>Patient:</span> A.L., 34 F (fictional)</div><div><span>Complaint:</span> fatigue, easy bruising</div>
+    <div><span>WBC:</span> <span class="hi">22.4 ×10³/µL</span></div><div><span>Hgb:</span> <span class="lo">8.1 g/dL</span></div>
+    <div><span>Plt:</span> <span class="lo">41 ×10³/µL</span></div><div><span>Analyzer flag:</span> <span class="flag f-amb">BLASTS?</span></div></div>
+    <table><tr><th>CELL CLASS (SOFTWARE)</th><th>%</th><th>STATUS</th></tr>
+    <tr><td>Segmented neutrophils</td><td>38</td><td>pre-classified</td></tr>
+    <tr><td>Lymphocytes</td><td>44</td><td>pre-classified</td></tr>
+    <tr><td>Monocytes</td><td>6</td><td>pre-classified</td></tr>
+    <tr><td>Reactive lymphocytes</td><td>9</td><td>pre-classified</td></tr>
+    <tr><td>Unidentified</td><td>3</td><td><span class="flag f-amb">NEEDS REVIEW</span></td></tr></table>
+    <div class="note">Cells from the “Lymphocytes” gallery (sample):</div>
+    <div class="cells">${[0,1,2,3].map(i=>cellSVG(i)).join("")}</div>
+  </div></div>`,
+  qs:[
+    {q:"What is the software's job in this workflow?",
+     o:["It makes the final diagnosis so a pathologist isn't needed",
+        "It finds, images, and suggests a class for each cell; a trained person verifies or reclassifies before results are reported",
+        "It only counts red blood cells",
+        "It replaces the CBC analyzer"],
+     a:1,
+     why:"Systems like this are cleared for use with human verification. The software proposes, and a skilled operator confirms or corrects each cell. That review step is part of how the device is meant to be used, not optional extra work."},
+    {q:"Look at the sample gallery: some 'lymphocytes' are large, with fine chromatin and visible nucleoli, and the analyzer flagged possible blasts. What should the technologist do?",
+     o:["Accept the software's counts. 97% of cells were classified",
+        "Report 'reactive lymphocytes' because the software is usually accurate",
+        "Review and reclassify the suspicious cells, then escalate the smear for pathologist review per lab policy",
+        "Wait and repeat the CBC tomorrow"],
+     a:2,
+     why:"Published evaluations report strong agreement for common normal cells and more disagreement for immature or abnormal cells, which are exactly the ones that matter most here. High overall accuracy doesn't guarantee the rare, important cell is right. The technologist's judgment and the escalation path protect the patient."}
+  ],
+  take:"AI that pre-classifies speeds up routine work, but it is weakest where cases are rare and stakes are high. 'Usually right' is not the same as 'right for this patient.'"
+},
+{
+  title:"The Plates the AI Set Aside",
+  area:"Microbiology · AI culture-plate reading",
+  emoji:"🧫",
+  story:`The microbiology lab uses an <b>AI plate reader</b> for urine cultures. After incubation, it photographs each agar plate and sorts it into <b>significant growth</b>, <b>no significant growth</b>, or <b>needs review</b>. Negative plates leave the workflow, so technologists can focus on positives. Last week the usual agar was backordered, and the lab started using a different brand.`,
+  screen:()=>`<div class="lis"><div class="head"><span class="sys">PLATE READER · OVERNIGHT URINE BATCH</span><span>RUN U-1107 · 84 PLATES</span></div><div class="body">
+    <table><tr><th>CATEGORY</th><th>PLATES</th><th>NEXT STEP</th></tr>
+    <tr><td><span class="flag f-red">SIGNIFICANT GROWTH</span></td><td>17</td><td>to technologist for ID / susceptibility</td></tr>
+    <tr><td><span class="flag f-grn">NO SIGNIFICANT GROWTH</span></td><td>58</td><td>auto-sorted negative</td></tr>
+    <tr><td><span class="flag f-amb">NEEDS REVIEW</span></td><td>9</td><td>to technologist</td></tr></table>
+    <div class="note">Media lot: <b>Brand B agar (substitute, in use since Mon)</b>. Analysis module setup lists: Brand A blood agar + Brand A MacConkey.<br>Patient R.K., 71 M (fictional), catheter urine: “No significant growth.” Provider called: patient febrile, asking whether culture is truly negative.</div>
+  </div></div>`,
+  qs:[
+    {q:"What is the main concern with this run?",
+     o:["The images are too large to store",
+        "The AI reader was cleared and validated with specific media; the substitute agar is outside the conditions its performance was established for",
+        "The AI is biased against older patients",
+        "There is no concern; the AI is FDA cleared"],
+     a:1,
+     why:"Clearance and validation cover a device used as intended, including specific media. Different agar can change colony color, contrast, and appearance in images. A cleared device used outside its validated conditions isn't automatically reliable, and the lab has to establish that it performs before relying on it."},
+    {q:"What should the lab do now?",
+     o:["Keep running. Clearance means it works with any plate",
+        "Ask the AI to rate its own confidence on each plate",
+        "Pause auto-sorting for Brand B plates, have technologists read them (including R.K.'s), and let the lab director decide whether to validate the new media",
+        "Delete this week's images to save space"],
+     a:2,
+     why:"The safe move is to put people back in the loop for the plates the AI wasn't validated on and to re-review results already sorted, starting with patients where it matters clinically. Decisions about validation belong to lab leadership, who are accountable for test quality."}
+  ],
+  take:"An AI tool is only as trustworthy as the match between how it was tested and how it's being used. Supply changes, new specimen types, or new populations can quietly break that match."
+}];
+
+const REFL = [
+  "Name one lab task you'd be glad to automate and one you think always needs a human check. Explain the difference.",
+  "You're new on the bench and a result released by the software looks wrong to you. What would you say, and to whom?",
+  "How might AI change the skills needed in the health profession you're preparing for?"
+];
+const MIN = 80;
+
+// stylized cell drawings (fictional illustrations)
+function cellSVG(i){
+  const big=i%2===0, r=big?30:21;
+  const nuc=big?`<circle cx="40" cy="40" r="25" fill="#7B4FA6"/><circle cx="34" cy="34" r="4" fill="#B79AD8"/><circle cx="47" cy="44" r="3.5" fill="#B79AD8"/>`
+                :`<circle cx="40" cy="40" r="18" fill="#3B1F66"/>`;
+  return `<div class="cell"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="${r+6}" fill="#9EC7E8"/>${nuc}</svg>${big?"large · fine chromatin · nucleoli":"small · dense chromatin"}</div>`;
+}
+
+// ---------------- State ----------------
+const S={screen:"intro",si:0,score:0,ans:SCEN.map(s=>s.qs.map(()=>null)),refl:REFL.map(()=>""),name:""};
+const app=document.getElementById("app");
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function setScore(){S.score=S.ans.flat().reduce((t,a,k)=>t,0);let t=0;S.ans.forEach((qs,si)=>qs.forEach((a,qi)=>{if(a===SCEN[si].qs[qi].a)t+=50}));S.score=t;$("#score").textContent=t}
+function go(sc){S.screen=sc;render();window.scrollTo({top:0,behavior:"smooth"})}
+
+function intro(){
+  app.innerHTML=`
+  <section class="card hero">
+    <div class="kick">🏥 Pre-professional series · Laboratory medicine</div>
+    <h1>Lab AI Rounds</h1>
+    <p>Most of the data behind clinical decisions comes from the laboratory, and more of it now passes through automation and AI before a person sees it. On these rounds you'll work three bench cases and decide what to trust, what to check, and when to speak up.</p>
+    <div class="meta"><span>⏱ 15–20 minutes</span><span>🧪 3 scenarios</span><span>🏆 300 points</span><span>📝 3 reflections + certificate</span></div>
+    <button class="btn mint" id="go">Begin Rounds ➜</button>
+  </section>
+  <section class="card">
+    <h3>Five terms you'll use</h3>
+    <div class="terms">
+      <div><b>Automation</b><small>Machines that move, process, and test specimens with little hands-on work.</small></div>
+      <div><b>Autoverification</b><small>Software releases results that pass lab-written rules; the rest wait for a person.</small></div>
+      <div><b>AI / machine learning</b><small>Software trained on examples to recognize patterns, such as cell or colony images.</small></div>
+      <div><b>Human-in-the-loop</b><small>A trained person reviews, confirms, or corrects what the software proposes.</small></div>
+      <div><b>Intended use</b><small>The exact conditions a device was cleared and validated for. Outside them, performance is unknown.</small></div>
+    </div>
+  </section>`;
+  $("#go").onclick=()=>{S.si=0;go("scen")};
+}
+
+function scen(){
+  const s=SCEN[S.si], A=S.ans[S.si];
+  const done=A.every(a=>a!==null);
+  app.innerHTML=`
+  <div class="prog"><span class="lbl">SCENARIO ${S.si+1} OF ${SCEN.length}</span><span class="dots">${SCEN.map((_,i)=>`<i class="${i<=S.si?'on':''}"></i>`).join("")}</span></div>
+  <section class="card">
+    <div class="kick">${s.emoji} ${s.area}</div>
+    <h2>${s.title}</h2>
+    <p class="story">${s.story}</p>
+    ${s.screen()}
+    ${s.qs.map((q,qi)=>{
+      const a=A[qi], locked=a!==null;
+      return `<div class="q"><div class="pts">QUESTION ${qi+1} · 50 PTS</div><div class="qh">${q.q}</div>
+        ${q.o.map((o,oi)=>`<button class="opt ${locked&&oi===q.a?'right':''} ${locked&&oi===a&&a!==q.a?'wrong':''}" data-q="${qi}" data-o="${oi}" ${locked?"disabled":""}><span class="L">${"ABCD"[oi]}</span><span>${o}</span></button>`).join("")}
+        ${locked?`<div class="fb ${a===q.a?'good':'miss'}"><b class="h">${a===q.a?"Correct · +50":"Not quite · the best answer is "+"ABCD"[q.a]}</b>${q.why}</div>`:""}
+      </div>`}).join("")}
+    ${done?`<div class="take"><b>Bench takeaway:</b> ${s.take}</div>`:""}
+    <div class="row">${done?`<button class="btn" id="next">${S.si<SCEN.length-1?"Next Scenario ➜":"Reflection ➜"}</button>`:`<span class="msg">Answer both questions to continue.</span>`}</div>
+  </section>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{A[+b.dataset.q]=+b.dataset.o;setScore();render()});
+  const n=$("#next"); if(n) n.onclick=()=>{if(S.si<SCEN.length-1){S.si++;go("scen")}else go("refl")};
+}
+
+function refl(){
+  app.innerHTML=`
+  <div class="prog"><span class="lbl">REFLECTION</span></div>
+  <section class="card">
+    <div class="kick">📝 In your own words</div>
+    <h2>Three short reflections</h2>
+    <p class="msg" style="margin-top:0">Write at least ${MIN} characters for each. Responses aren't scored or saved online; they appear on your certificate summary for your instructor.</p>
+    ${REFL.map((r,i)=>`<div class="q"><div class="qh">${i+1}. ${r}</div><textarea data-i="${i}">${esc(S.refl[i])}</textarea><div class="cc" id="cc${i}"></div></div>`).join("")}
+    <div class="row"><button class="btn" id="res" disabled>See My Results ➜</button></div>
+  </section>`;
+  const upd=()=>{S.refl.forEach((t,i)=>{const c=$("#cc"+i);c.textContent=`${t.trim().length} / ${MIN} characters`;c.classList.toggle("ok",t.trim().length>=MIN)});
+    $("#res").disabled=!S.refl.every(t=>t.trim().length>=MIN)};
+  app.querySelectorAll("textarea").forEach(t=>t.oninput=()=>{S.refl[+t.dataset.i]=t.value;upd()});
+  upd(); $("#res").onclick=()=>go("results");
+}
+
+function results(){
+  const correct=S.ans.flat().filter((a,k)=>a===SCEN[Math.floor(k/2)].qs[k%2].a).length;
+  const title=S.score>=250?"Bench-ready reviewer":S.score>=150?"Developing reviewer":"Keep practicing";
+  app.innerHTML=`
+  <section class="card">
+    <div class="kick">🏁 Rounds Complete</div>
+    <div class="row" style="margin-top:6px;align-items:flex-end;gap:18px"><div class="big">${S.score}</div><div><h2 style="margin:0">${title}</h2><div class="msg" style="margin:0">${correct} of 6 questions correct · 300 possible</div></div></div>
+  </section>
+  <section class="card">
+    <h3>What this activity covered</h3>
+    <div class="covered">
+      <div>⚗️ <b>Automation and autoverification</b> are rule-based. They catch only what the rules anticipate, so preanalytical problems like delayed processing can slip through.</div>
+      <div>🔬 <b>AI pre-classification</b> supports trained reviewers. It's strongest on common normal findings and weakest on the rare, abnormal ones that matter most.</div>
+      <div>🧫 <b>Intended use matters.</b> A cleared AI tool used outside its validated conditions, such as with different media, needs human review and lab validation.</div>
+      <div>🗣 <b>Speaking up</b> is part of quality. Lab professionals own the rules, review the exceptions, and escalate when something doesn't fit.</div>
+    </div>
+    <h3 style="margin-top:20px">Learn more</h3>
+    <ul class="links">
+      <li><a href="https://clsi.org/shop/standards/auto15/" target="_blank" rel="noopener">CLSI AUTO15: Autoverification of Medical Laboratory Results</a></li>
+      <li><a href="https://www.captodayonline.com/autoverification-lessons-drawn-from-a-core-lab/" target="_blank" rel="noopener">CAP Today: Autoverification lessons from a core lab</a></li>
+      <li><a href="https://www.accessdata.fda.gov/cdrh_docs/reviews/K200595.pdf" target="_blank" rel="noopener">FDA decision summary: a digital cell morphology system (K200595)</a></li>
+      <li><a href="https://www.captodayonline.com/apas-independence-gets-fda-clearance/" target="_blank" rel="noopener">CAP Today: First FDA-cleared AI culture-plate reader</a></li>
+    </ul>
+  </section>
+  <section class="card">
+    <h3>Generate your completion certificate</h3>
+    <input type="text" id="nm" placeholder="Your full name" value="${esc(S.name)}">
+    <div class="row"><button class="btn" id="mk">Create Certificate</button><button class="btn ghost" id="again">Retake Rounds</button></div>
+    <div id="certArea"></div>
+  </section>`;
+  $("#nm").oninput=e=>S.name=e.target.value;
+  $("#mk").onclick=makeCert;
+  $("#again").onclick=()=>{Object.assign(S,{si:0,ans:SCEN.map(s=>s.qs.map(()=>null)),refl:REFL.map(()=>"")});setScore();go("intro")};
+}
+
+function makeCert(){
+  const nm=S.name.trim(); if(!nm){$("#certArea").innerHTML=`<p class="msg">Enter your name first.</p>`;return}
+  const date=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  $("#certArea").innerHTML=`<div class="cert"><div class="kick">Certificate of Completion</div><div class="nm">${esc(nm)}</div>
+    <div>completed <b>Lab AI Rounds: AI and Automation in Laboratory Medicine</b></div>
+    <div style="margin-top:6px">Score: <b>${S.score} / 300</b> · ${date}</div><small>3 scenarios · 6 questions · 3 reflections</small></div>
+    <div class="row"><button class="btn" id="pdf">Download PDF</button></div><p class="msg" id="pdfmsg"></p>`;
+  $("#pdf").onclick=()=>{
+    try{
+      const {jsPDF}=window.jspdf; const d=new jsPDF({orientation:"landscape",unit:"pt",format:"letter"});
+      const W=d.internal.pageSize.getWidth(), H=d.internal.pageSize.getHeight();
+      d.setDrawColor(0,108,104); d.setLineWidth(4); d.rect(28,28,W-56,H-56); d.setLineWidth(1); d.rect(38,38,W-76,H-76);
+      d.setFont("helvetica","bold"); d.setTextColor(0,108,104); d.setFontSize(14); d.text("CERTIFICATE OF COMPLETION",W/2,110,{align:"center"});
+      d.setTextColor(15,27,45); d.setFontSize(34); d.text(nm,W/2,175,{align:"center"});
+      d.setFont("helvetica","normal"); d.setFontSize(15); d.text("has completed",W/2,212,{align:"center"});
+      d.setFont("helvetica","bold"); d.setFontSize(19); d.text("Lab AI Rounds: AI and Automation in Laboratory Medicine",W/2,244,{align:"center"});
+      d.setFont("helvetica","normal"); d.setFontSize(14); d.text(`Score: ${S.score} / 300   ·   ${date}`,W/2,278,{align:"center"});
+      d.addPage("letter","portrait"); const w2=d.internal.pageSize.getWidth(); let y=60;
+      d.setFont("helvetica","bold"); d.setFontSize(15); d.text("Reflection responses: "+nm,48,y); y+=26;
+      REFL.forEach((r,i)=>{d.setFont("helvetica","bold");d.setFontSize(11);const ql=d.splitTextToSize(`${i+1}. ${r}`,w2-96);d.text(ql,48,y);y+=ql.length*14+4;
+        d.setFont("helvetica","normal");const al=d.splitTextToSize(S.refl[i].trim(),w2-96);
+        al.forEach(l=>{if(y>740){d.addPage();y=60}d.text(l,48,y);y+=14});y+=14});
+      d.save(`Lab_AI_Rounds_Certificate_${nm.replace(/\s+/g,"_")}.pdf`);
+      $("#pdfmsg").textContent="If no download started, your viewer blocks downloads. Take a screenshot of the certificate above, or open the hosted version of this activity.";
+    }catch(e){$("#pdfmsg").textContent="PDF download isn't available in this viewer. Take a screenshot of the certificate above instead."}
+  };
+}
+
+function render(){({intro,scen,refl,results})[S.screen]()}
+render();
+</script>
+</body>
+</html>
